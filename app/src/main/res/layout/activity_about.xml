@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".AboutActivity">
+
+    <LinearLayout android:layout_width="match_parent"
+                  android:orientation="horizontal"
+                  android:background="?attr/colorPrimary"
+                  android:alpha="0.9"
+                  android:id="@+id/images_toolbar"
+                  android:layout_height="50dp">
+
+        <ImageView android:layout_width="20dp"
+                   android:src="@drawable/back_button"
+                   android:onClick="goBack"
+                   android:layout_marginRight="10dp"
+                   android:layout_marginLeft="10dp"
+                   android:layout_gravity="center"
+                   android:layout_height="20dp"/>
+
+        <TextView android:layout_width="wrap_content"
+                  android:text="Send.it - About"
+                  android:textSize="@dimen/toolbar_font_size"
+                  android:textColor="#FFF"
+                  android:textStyle="bold"
+                  android:id="@+id/toolbar_text_images"
+                  android:layout_weight="1"
+                  android:layout_gravity="center_vertical"
+                  android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+    <include layout="@layout/content_about"/>
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

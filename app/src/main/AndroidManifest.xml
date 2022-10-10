@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="chad.orionsoft.sendit">
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+
+    <application
+            android:allowBackup="true"
+            android:icon="@drawable/sendit_icon_new_small"
+            android:label="@string/app_name"
+            android:roundIcon="@drawable/sendit_icon_new_small"
+            android:supportsRtl="true"
+            android:theme="@style/AppTheme">
+        <provider
+                android:name=".FProvider"
+                android:authorities="${applicationId}.provider"
+                android:exported="false"
+                android:grantUriPermissions="true">
+            <meta-data
+                    android:name="android.support.FILE_PROVIDER_PATHS"
+                    android:resource="@xml/provider_paths"/>
+        </provider>
+
+        <activity android:name=".PermissionActivity">
+        </activity>
+        <activity
+                android:exported="true"
+                android:name=".AskTheNameAct"
+                android:theme="@style/DialogTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity
+                android:name=".MainActivity"
+                android:label="@string/title_activity_main"
+                android:screenOrientation="portrait"
+                android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+                android:exported="true"
+                android:name=".SendActivityEX"
+                android:launchMode="singleTop"
+                android:screenOrientation="portrait"
+                android:theme="@style/SenderTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+                <action android:name="android.intent.action.SEND_MULTIPLE"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+
+                <data android:mimeType="*/*"/>
+            </intent-filter>
+        </activity>
+        <activity
+                android:name=".EditorActivity"
+                android:label="Send.it - Edit"
+                android:screenOrientation="portrait">
+        </activity>
+        <activity
+                android:name=".SendActivityAPK"
+                android:screenOrientation="portrait"
+                android:theme="@style/SenderTheme.NoActionBar">
+        </activity>
+        <activity
+                android:name=".CreateConnectionSender"
+                android:screenOrientation="portrait"
+                android:theme="@style/DialogTheme">
+        </activity>
+        <activity
+                android:name=".CreateConnectionReceiver"
+                android:screenOrientation="portrait"
+                android:theme="@style/DialogTheme">
+        </activity>
+        <activity
+                android:name=".ReceiveNow"
+                android:label="Receiving Now"
+                android:screenOrientation="portrait"
+                android:theme="@style/ReceiverTheme.NoActionBar">
+        </activity>
+        <activity
+                android:name=".ReceiveNowQ"
+                android:label="Receiving Now"
+                android:screenOrientation="portrait"
+                android:theme="@style/ReceiverTheme.NoActionBar">
+        </activity>
+        <activity
+                android:name=".SendActivityNew"
+                android:screenOrientation="portrait"
+                android:theme="@style/SenderTheme.NoActionBar">
+        </activity>
+        <activity
+                android:name=".ConnectNowDialog"
+                android:screenOrientation="portrait"
+                android:theme="@style/DialogTheme">
+        </activity>
+        <activity
+                android:name=".SendOptions"
+                android:screenOrientation="portrait"
+                android:theme="@style/SenderTheme">
+        </activity>
+        <activity
+                android:name=".SendNow"
+                android:label="@string/send_now_label"
+                android:screenOrientation="portrait"
+                android:theme="@style/SenderTheme">
+        </activity>
+        <activity
+                android:name=".SendNowQ"
+                android:label="@string/send_now_label"
+                android:screenOrientation="portrait"
+                android:theme="@style/SenderTheme">
+        </activity>
+        <activity
+                android:name=".SendActivityImages"
+                android:screenOrientation="portrait"
+                android:theme="@style/SenderTheme.NoActionBar">
+        </activity>
+        <activity
+                android:name=".SendActivityImagesQ"
+                android:screenOrientation="portrait"
+                android:theme="@style/SenderTheme.NoActionBar">
+        </activity>
+        <activity
+                android:name=".ViewImage"
+                android:theme="@style/SenderTheme.NoActionBar">
+        </activity>
+        <activity
+                android:name=".ViewImageQ"
+                android:theme="@style/SenderTheme.NoActionBar">
+        </activity>
+        <activity
+                android:name=".SendActivityAudio"
+                android:screenOrientation="portrait"
+                android:theme="@style/SenderTheme.NoActionBar">
+        </activity>
+        <activity
+                android:name=".SendActivityAudioQ"
+                android:screenOrientation="portrait"
+                android:theme="@style/SenderTheme.NoActionBar">
+        </activity>
+        <activity
+                android:name=".AudioPlayer"
+                android:screenOrientation="portrait"
+                android:theme="@style/DialogTheme"/>
+        <activity
+                android:name=".AudioPlayerQ"
+                android:screenOrientation="portrait"
+                android:theme="@style/DialogTheme"/>
+        <activity
+                android:name=".SendActivityVideo"
+                android:screenOrientation="portrait"
+                android:theme="@style/SenderTheme.NoActionBar">
+        </activity>
+        <activity
+                android:name=".SendActivityVideoQ"
+                android:screenOrientation="portrait"
+                android:theme="@style/SenderTheme.NoActionBar">
+        </activity>
+        <activity
+                android:name=".VideoPlayer"
+                android:screenOrientation="portrait"
+                android:theme="@style/DialogTheme"/>
+        <activity
+                android:name=".VideoPlayerQ"
+                android:screenOrientation="portrait"
+                android:theme="@style/DialogTheme"/>
+        <activity
+                android:name=".SendActivityPDF"
+                android:screenOrientation="portrait"
+                android:theme="@style/SenderTheme.NoActionBar">
+        </activity>
+        <activity
+                android:name=".SendActivityOffice"
+                android:screenOrientation="portrait"
+                android:theme="@style/SenderTheme.NoActionBar">
+        </activity>
+        <activity
+                android:name=".SendActivitySearch"
+                android:screenOrientation="portrait"
+                android:theme="@style/SenderTheme.NoActionBar">
+        </activity>
+        <activity
+                android:name=".ConnectionCheck"
+                android:screenOrientation="portrait"
+                android:theme="@style/DialogTheme">
+        </activity>
+        <activity
+                android:name=".SendActivityStorage"
+                android:theme="@style/SenderTheme">
+        </activity>
+        <activity
+                android:name=".AboutActivity"
+                android:label="@string/title_activity_about"
+                android:theme="@style/SenderTheme.NoActionBar">
+        </activity>
+    </application>
+
+</manifest>

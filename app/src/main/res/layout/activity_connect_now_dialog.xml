@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_margin="10dp"
+        tools:context=".ConnectNowDialog">
+
+    <chad.orionsoft.sendit.AppTextView
+            android:layout_width="wrap_content"
+            android:textColor="@color/SenderPrimary"
+            android:textSize="@dimen/font_size_medium"
+            android:text="Connect to Receiver Now?"
+            android:layout_height="wrap_content"/>
+
+    <LinearLayout android:layout_width="wrap_content"
+                  android:orientation="horizontal"
+                  android:layout_margin="10dp"
+                  android:layout_height="wrap_content">
+        <Button android:layout_width="wrap_content"
+                android:text="Now"
+                android:background="@drawable/item_background_select"
+                android:onClick="connectNow"
+                android:layout_margin="10dp"
+                android:layout_height="wrap_content"/>
+        <Button android:layout_width="wrap_content"
+                android:text="Later"
+                android:background="@drawable/item_background"
+                android:onClick="connectLater"
+                android:layout_margin="10dp"
+                android:layout_height="wrap_content"/>
+    </LinearLayout>
+</LinearLayout>

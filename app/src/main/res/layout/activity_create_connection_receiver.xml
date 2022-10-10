@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        tools:context=".CreateConnectionReceiver">
+
+    <chad.orionsoft.sendit.AppTextView
+            android:layout_width="wrap_content"
+            android:text="Waiting for Sender"
+            android:layout_margin="10dp"
+            android:textColor="?attr/colorPrimary"
+            android:textSize="@dimen/font_size_medium"
+            android:id="@+id/receiver_connection_heading"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_height="wrap_content"/>
+
+    <ProgressBar android:layout_width="wrap_content"
+                 android:layout_gravity="center"
+                 android:id="@+id/receiver_connect_progressbar"
+                 android:layout_height="wrap_content"/>
+    <chad.orionsoft.sendit.AppTextView
+            android:layout_width="wrap_content"
+            android:textColor="@color/SenderPrimary"
+            android:text="Enter code below to connect"
+            android:layout_margin="10dp"
+            android:visibility="gone"
+            android:id="@+id/receiver_enter_code_info"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content"/>
+
+    <chad.orionsoft.sendit.AppEditText
+            android:layout_width="wrap_content"
+            android:hint="CODE"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:id="@+id/receiver_enter_code_edit"
+            android:visibility="gone"
+            android:inputType="numberDecimal"
+            android:textSize="@dimen/font_size_medium"
+            android:textColor="?attr/colorPrimary"
+            android:layout_height="wrap_content"/>
+
+    <LinearLayout android:layout_width="wrap_content"
+                  android:orientation="horizontal"
+                  android:layout_gravity="center"
+                  android:layout_height="wrap_content">
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:id="@+id/receiver_connect_button"
+                android:src="@drawable/done_button"
+                android:layout_margin="10dp"
+                android:visibility="gone"
+                android:layout_height="wrap_content"/>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_alignParentRight="true"
+                android:id="@+id/receiver_cancel_button"
+                android:layout_margin="10dp"
+                android:src="@drawable/cancel_icon"
+                android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <ScrollView android:layout_width="match_parent"
+                android:visibility="gone"
+                android:layout_height="200dp">
+        <LinearLayout android:layout_width="wrap_content"
+                      android:orientation="vertical"
+                      android:layout_height="wrap_content">
+            <TextView android:layout_width="wrap_content"
+                      android:id="@+id/dynamicInfo"
+                      android:textColor="#000"
+                      android:text="testing"
+                      android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+    </ScrollView>
+</LinearLayout>

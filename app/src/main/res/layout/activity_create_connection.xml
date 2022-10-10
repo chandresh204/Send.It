@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:orientation="vertical"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        tools:context=".CreateConnectionSender">
+
+    <chad.orionsoft.sendit.AppTextView
+            android:layout_width="wrap_content"
+            android:textSize="@dimen/font_size_medium"
+            android:layout_gravity="center"
+            android:layout_margin="5dp"
+            android:id="@+id/connect_send_heading"
+            android:textColor="@color/SenderPrimary"
+            android:text="Searching for receiver"
+            android:layout_height="wrap_content"/>
+    <ScrollView android:layout_width="300dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_gravity="center"
+                android:layout_height="wrap_content">
+        <LinearLayout android:layout_width="250dp"
+                      android:id="@+id/receiverBtnLayout"
+                      android:orientation="vertical"
+                      android:layout_gravity="center"
+                      android:layout_height="wrap_content">
+        </LinearLayout>
+    </ScrollView>
+
+    <chad.orionsoft.sendit.AppTextView
+            android:layout_width="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_margin="5dp"
+            android:id="@+id/connect_send_text"
+            android:textColor="@color/GreenPrimary"
+            android:text="please wait..."
+            android:layout_height="wrap_content"/>
+    <chad.orionsoft.sendit.AppTextView
+            android:layout_width="wrap_content"
+            android:textSize="@dimen/font_size_medium"
+            android:textColor="#FFF"
+            android:id="@+id/code_text"
+            android:visibility="gone"
+            android:background="@color/SenderPrimary"
+            android:text="0000"
+            android:layout_margin="20dp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_height="wrap_content"/>
+    <RelativeLayout android:layout_width="wrap_content"
+                    android:layout_gravity="center"
+                    android:id="@+id/button_relative_layout"
+                    android:layout_height="wrap_content">
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="12dp"
+                android:id="@+id/cancel_button"
+                android:src="@drawable/cancel_icon"
+                android:layout_height="wrap_content"/>
+        <ProgressBar android:layout_width="80dp"
+                     android:layout_height="80dp"/>
+    </RelativeLayout>
+
+</LinearLayout>

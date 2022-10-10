@@ -1,0 +1,55 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/SenderPrimary</item>
+        <item name="colorPrimaryDark">@color/GreenPrimary</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+
+    <style name="DialogTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowCloseOnTouchOutside">false</item>
+        <item name="dialogCornerRadius">20dp</item>
+        <item name="colorPrimary">@color/SenderPrimary</item>
+        <item name="colorPrimaryDark">@color/SenderDark</item>
+        <item name="colorAccent">@color/colorBlue</item>
+    </style>
+
+    <style name="SenderTheme" parent="AppTheme">
+        <item name="colorPrimary">@color/VioletPrimary</item>
+        <item name="colorPrimaryDark">@color/VioletDark</item>
+        <item name="colorAccent">@color/GreenPrimary</item>
+    </style>
+
+    <style name="SenderTheme.NoActionBar" parent="SenderTheme">
+        <item name="colorPrimary">@color/VioletPrimary</item>
+        <item name="colorPrimaryDark">@color/VioletDark</item>
+        <item name="colorAccent">@color/GreenPrimary</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="ReceiverTheme" parent="AppTheme">
+        <item name="colorPrimary">@color/GreenPrimary</item>
+        <item name="colorPrimaryDark">@color/GreenDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="ReceiverTheme.NoActionBar" parent="ReceiverTheme">
+        <item name="colorPrimary">@color/GreenPrimary</item>
+        <item name="colorPrimaryDark">@color/GreenDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+</resources>

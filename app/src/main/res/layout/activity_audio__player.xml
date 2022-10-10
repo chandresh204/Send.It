@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        tools:context=".AudioPlayer">
+
+    <TextView android:layout_width="300dp"
+              android:text="Title - Artist"
+              android:layout_gravity="center"
+              android:gravity="center"
+              android:id="@+id/titleTextAudioPlayer"
+              android:background="#6644EE"
+              android:textColor="#FFF"
+              android:layout_height="wrap_content"/>
+
+    <RelativeLayout android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+        <ImageView android:layout_width="300dp"
+                   android:id="@+id/album_art_playing"
+                   android:src="@drawable/music_icon"
+                   android:scaleType="fitXY"
+                   android:layout_height="300dp"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:src="@drawable/cancel_icon"
+                android:id="@+id/cancel_play"
+                android:scaleX="0.5"
+                android:scaleY="0.5"
+                android:backgroundTint="#FF0000"
+                android:layout_height="wrap_content"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:src="@drawable/media_play_icon_tiny"
+                android:scaleX="0.5"
+                android:scaleY="0.5"
+                android:id="@+id/play_again_button"
+                android:visibility="gone"
+                android:layout_height="wrap_content"/>
+    </RelativeLayout>
+
+    <SeekBar android:layout_width="match_parent"
+             android:id="@+id/audio_seek"
+             android:layout_height="wrap_content"/>
+
+    <LinearLayout android:layout_width="match_parent"
+                  android:orientation="horizontal"
+                  android:layout_height="wrap_content">
+        <TextView android:layout_width="wrap_content"
+                  android:text="00:00"
+                  android:layout_marginStart="20dp"
+                  android:layout_height="wrap_content"/>
+        <TextView android:layout_width="wrap_content"
+                  android:id="@+id/playing_time"
+                  android:text="00:00"
+                  android:layout_gravity="center"
+                  android:gravity="center"
+                  android:layout_weight="1"
+                  android:layout_height="wrap_content"/>
+        <TextView android:layout_width="wrap_content"
+                  android:id="@+id/durationText"
+                  android:text="99:99"
+                  android:layout_marginEnd="20dp"
+                  android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+</LinearLayout>

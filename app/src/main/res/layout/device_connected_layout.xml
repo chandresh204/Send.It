@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="wrap_content"
+              android:layout_margin="10dp"
+              android:layout_height="wrap_content">
+
+    <TextView android:layout_width="wrap_content"
+              android:text="Connected"
+              android:textSize="@dimen/font_size_medium"
+              android:textColor="@color/SenderPrimary"
+              android:layout_gravity="center"
+              android:layout_height="wrap_content"/>
+    <TextView android:layout_width="wrap_content"
+              android:id="@+id/connection_name_text"
+              android:text="Device1234"
+              android:textColor="@color/GreenPrimary"
+              android:layout_gravity="center"
+              android:layout_height="wrap_content"/>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:src="@drawable/done_button"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:id="@+id/connected_OK_btn"
+            android:layout_height="wrap_content"/>
+</LinearLayout>

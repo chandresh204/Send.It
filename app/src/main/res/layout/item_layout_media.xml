@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:id="@+id/item_bar_layout"
+              android:background="@drawable/item_background"
+              android:layout_width="match_parent"
+              android:layout_margin="5dp"
+              android:layout_height="wrap_content">
+
+    <ImageView android:layout_width="50dp"
+               android:src="@mipmap/ic_launcher"
+               android:id="@+id/item_icon"
+               android:layout_marginStart="15dp"
+               android:layout_gravity="center"
+               android:layout_height="50dp"/>
+    <LinearLayout android:layout_width="match_parent"
+                  android:orientation="vertical"
+                  android:layout_margin="10dp"
+                  android:layout_weight="1"
+                  android:layout_height="wrap_content">
+        <TextView
+                android:layout_width="wrap_content"
+                android:textStyle="bold"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:singleLine="true"
+                android:scrollHorizontally="true"
+                android:textColor="#000"
+                android:text="item_title"
+                android:id="@+id/item_title"
+                android:layout_height="wrap_content"/>
+        <TextView
+                android:layout_width="wrap_content"
+                android:textColor="#000"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:singleLine="true"
+                android:scrollHorizontally="true"
+                android:text="item_descr"
+                android:visibility="gone"
+                android:id="@+id/item_descr"
+                android:layout_height="wrap_content"/>
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:id="@+id/item_prop"
+                android:text="item properties"
+                android:textStyle="italic"
+                android:textColor="#000"
+                android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <ImageView android:layout_width="40dp"
+               android:id="@+id/item_action_button"
+               android:layout_gravity="center"
+               android:visibility="gone"
+               android:layout_marginEnd="15dp"
+               android:src="@drawable/media_play_icon_tiny"
+               android:layout_height="40dp"/>
+</LinearLayout>

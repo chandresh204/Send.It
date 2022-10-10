@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="select all" android:id="@+id/select_all_images"/>
+    <item android:title="clear selected" android:id="@+id/clear_selected_images" />
+</menu>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="match_parent"
+        tools:context=".EditorActivity">
+
+    <chad.orionsoft.sendit.AppTextView
+            android:layout_margin="5dp"
+            android:layout_width="wrap_content"
+            android:text="Username:"
+            android:layout_gravity="center"
+            android:textColor="@color/SenderDark"
+            android:textSize="@dimen/font_size_medium"
+            android:layout_height="wrap_content"/>
+
+    <chad.orionsoft.sendit.AppEditText
+                android:layout_width="wrap_content"
+                android:ems="6"
+                android:layout_gravity="center"
+                android:id="@+id/usernameEditText"
+                android:textSize="@dimen/font_size_medium"
+                android:layout_height="wrap_content"/>
+
+    <LinearLayout
+            android:layout_width="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center"
+            android:layout_height="wrap_content">
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16dp"
+            android:text="Maximun Image size allowed in MB: "/>
+
+        <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+            android:text="10"
+                android:id="@+id/maxMemEdit"
+            android:ems="2"
+                android:inputType="numberDecimal"
+            android:gravity="center"/>
+    </LinearLayout>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="italic"
+            android:gravity="center"
+            android:layout_margin="8dp"
+        android:text="@string/image_max_bytes_guide"/>
+    <ImageView
+            android:layout_width="match_parent"
+            android:src="@drawable/shadow_bottom"
+            android:layout_height="wrap_content"/>
+
+    <LinearLayout android:layout_width="match_parent"
+                  android:orientation="horizontal"
+                  android:gravity="center"
+                  android:layout_height="wrap_content">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_margin="20dp"
+                android:layout_gravity="center"
+                android:scaleY="1.5"
+                android:scaleX="1.5"
+                android:backgroundTint="@color/colorBlue"
+                android:id="@+id/finishEdit"
+                android:onClick="finishEdit"
+                android:src="@drawable/done_button"
+                android:layout_height="wrap_content"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_margin="20dp"
+                android:layout_gravity="center"
+                android:scaleY="1.5"
+                android:scaleX="1.5"
+                android:onClick="cancelEdit"
+                android:backgroundTint="@color/colorRed"
+                android:id="@+id/cancelEdit"
+                android:src="@drawable/cancel_icon"
+                android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+    <chad.orionsoft.sendit.AppTextView
+            android:text="@string/app_version"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+</LinearLayout>

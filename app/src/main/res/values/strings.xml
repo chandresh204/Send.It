@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Send.it</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="app_version">2.2</string>
+    <string name="send_it_directory">Send_it</string>
+    <string name="send_it_apk_save_directory">Send_it/saved_APKs</string>
+    <string name="send_now_label">Sending Now</string>
+    <string name="nothing_found">Nothing Found</string>
+    <string name="APK_warning">Some APKs are made for your own device only, They may not supported by other device
+    </string>
+    <string name="create_network_info">Needs to turn on the mobile hotspot and let other device connect to you</string>
+    <string name="connect_wifi_info">Needs to turn on wifi then connect to other device</string>
+    <string name="no_space_error">Receiver doesn\'t have that much space, check the red banner below</string>
+    <string name="receiver_waiting">Received files will appear here</string>
+    <string name="wlan_connection_found">WLAN connection found</string>
+    <string name="wlan_connection_required">WLAN connection required</string>
+    <string name="title_activity_about">AboutActivity</string>
+
+    <string name="image_max_bytes_guide">Please reduce above value if the app crashing while loading images</string>
+</resources>

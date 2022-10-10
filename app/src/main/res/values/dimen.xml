@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="font_size_medium">20dp</dimen>
+    <dimen name="font_size_small">10dp</dimen>
+    <dimen name="toolbar_font_size">22dp</dimen>
+</resources>
