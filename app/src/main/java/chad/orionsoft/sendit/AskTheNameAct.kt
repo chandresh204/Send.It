@@ -20,18 +20,18 @@ class AskTheNameAct : AppCompatActivity() {
     private lateinit var editor:SharedPreferences.Editor
     private var nextAct:Int=0
     private lateinit var binding: ActivityAskTheNameBinding
-    private lateinit var name_editText : EditText
+    private lateinit var nameEditText : EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAskTheNameBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        name_editText = binding.nameEditText
+        nameEditText = binding.nameEditText
         prefs=getSharedPreferences("prefs", Context.MODE_PRIVATE)
         nextAct=intent.getIntExtra("nextAct",0)
         val newUser=prefs.getBoolean("newUser",true)
         val typeface=Typeface.createFromAsset(assets,"fonts/opensans-regular.ttf")
-        name_editText.typeface=typeface
+        nameEditText.typeface=typeface
         if(!newUser) {
             goToNextActivity()
         }
@@ -39,10 +39,10 @@ class AskTheNameAct : AppCompatActivity() {
 
     fun setName(v: View) {
         v.id
-        if(name_editText.text.isNullOrEmpty()) {
-            name_editText.error="invalid"
+        if(nameEditText.text.isNullOrEmpty()) {
+            nameEditText.error="invalid"
         } else {
-            val username=name_editText.text.toString()
+            val username=nameEditText.text.toString()
             editor=prefs.edit()
             editor.putString("username",username)
             editor.putBoolean("newUser",false)

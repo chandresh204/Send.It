@@ -16,8 +16,8 @@ class ViewImage : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityViewImageBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val path=intent.getStringExtra("path")
-        val imageFile=File(path!!)
+        val path=intent.getStringExtra("path") ?: "path"
+        val imageFile=File(path)
         val dataSize=imageFile.length()
         if (dataSize >= Connection.maxImageMemAllowed) {
             val info= Connection.formatDataString(dataSize,' ')

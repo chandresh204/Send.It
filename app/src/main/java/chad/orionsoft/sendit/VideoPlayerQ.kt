@@ -19,7 +19,7 @@ class VideoPlayerQ : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityVideoPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        title=intent.getStringExtra("title")!!
+        title=intent.getStringExtra("title") ?: "title"
         val uriStr=intent.getStringExtra("uri")
         uri = Uri.parse(uriStr)
         duration=intent.getIntExtra("duration",0)
@@ -42,8 +42,8 @@ class VideoPlayerQ : AppCompatActivity() {
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                val progress=seekBar?.progress
-                binding.videoView.seekTo(duration*progress!!/100)
+                val progress=seekBar?.progress ?: 0
+                binding.videoView.seekTo(duration*progress/100)
             }
 
         })

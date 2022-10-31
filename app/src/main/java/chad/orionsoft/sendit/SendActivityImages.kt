@@ -46,7 +46,7 @@ class SendActivityImages : AppCompatActivity() {
             true
         }
         updateBelowBar()
-        GlobalScope.launch (Dispatchers.Main){
+        CoroutineScope(Dispatchers.Main).launch {
             getThumbnailsAsync().await()
         }
         binding.imageRecyclerView.layoutManager= GridLayoutManager(applicationContext,3)
@@ -150,6 +150,7 @@ class SendActivityImages : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun showPopUpMenu(v:View) {
         val themeCtx=ContextThemeWrapper(applicationContext,R.style.SenderTheme_NoActionBar)
         val popup=PopupMenu(themeCtx,v)
@@ -206,7 +207,7 @@ class SendActivityImages : AppCompatActivity() {
             val selectionMark=holder.selectionMark
 
             if (images[position].thumbData != "null") {
-                GlobalScope.launch (Dispatchers.Main) {
+                CoroutineScope(Dispatchers.Main).launch {
                     val bMap = getThumbnailAsync(images[position].thumbData).await()
                     imageView.setImageBitmap(bMap)
                     imageView.animate().apply {
@@ -262,7 +263,7 @@ class SendActivityImages : AppCompatActivity() {
 
         val imageFile=File(imageDATA)
         val size=imageFile.length()
-        val thumbName="$id:$title"
+   //    val thumbName="$id:$title"
         val lastModified=imageFile.lastModified()
     }
 }

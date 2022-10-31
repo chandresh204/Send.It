@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.view.*
 import android.widget.*
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import chad.orionsoft.sendit.databinding.ActivitySendAudioBinding
@@ -193,6 +194,7 @@ class SendActivityAudio : AppCompatActivity() {
     }
 
     fun goBack(v:View) {
+        v.id
         onBackPressed()
     }
 
@@ -232,18 +234,30 @@ class SendActivityAudio : AppCompatActivity() {
             titleText.text=aList[position].title
 
             if(aList[position].isSelected) {
-                audioItemLayout.background=resources.getDrawable(R.drawable.item_background_select)
+                audioItemLayout.background=
+                    ResourcesCompat.getDrawable(
+                        this@SendActivityAudio.resources,
+                        R.drawable.item_background_select,
+                        this@SendActivityAudio.theme)
                 titleText.isSelected=true
                 artistText.isSelected=true
             } else {
-                audioItemLayout.background=resources.getDrawable(R.drawable.item_background)
+                audioItemLayout.background=
+                    ResourcesCompat.getDrawable(
+                        this@SendActivityAudio.resources,
+                        R.drawable.item_background,
+                        this@SendActivityAudio.theme)
                 titleText.isSelected=false
                 artistText.isSelected=false
             }
             audioItemLayout.setOnClickListener {
                 if(aList[position].isSelected) {
                     aList[position].isSelected=false
-                    audioItemLayout.background=resources.getDrawable(R.drawable.item_background)
+                    audioItemLayout.background =
+                        ResourcesCompat.getDrawable(
+                            this@SendActivityAudio.resources,
+                            R.drawable.item_background,
+                            this@SendActivityAudio.theme)
                     titleText.isSelected=false
                     artistText.isSelected=false
                     selectedAudioFiles--
@@ -251,7 +265,11 @@ class SendActivityAudio : AppCompatActivity() {
                     updateBelowBar()
                 } else {
                     aList[position].isSelected=true
-                    audioItemLayout.background=resources.getDrawable(R.drawable.item_background_select)
+                    audioItemLayout.background =
+                        ResourcesCompat.getDrawable(
+                            this@SendActivityAudio.resources,
+                            R.drawable.item_background_select,
+                            this@SendActivityAudio.theme)
                     titleText.isSelected=true
                     artistText.isSelected=true
                     selectedAudioFiles++
@@ -266,7 +284,11 @@ class SendActivityAudio : AppCompatActivity() {
                 artistText.visibility=View.VISIBLE
                 artistText.text=aList[position].artist
             }
-            albumArt.setImageDrawable(resources.getDrawable(R.drawable.music_icon_small))
+            albumArt.setImageDrawable(
+                ResourcesCompat.getDrawable(
+                    this@SendActivityAudio.resources,
+                    R.drawable.music_icon_small,
+                    this@SendActivityAudio.theme))
             if(aList[position].albumArt!=null) {
                 if(artMap[aList[position].id] !=null) {
                     albumArt.setImageBitmap(artMap[aList[position].id])
@@ -303,9 +325,9 @@ class SendActivityAudio : AppCompatActivity() {
 
             override fun performFiltering(p0: CharSequence?): FilterResults {
                 val filteredList=ArrayList<AudioObject>()
-                val queryText=p0.toString().toLowerCase()
+                val queryText=p0.toString().lowercase()
                 for(i in fullList) {
-                    if(i.title.toLowerCase().trim().contains(queryText) || i.artist.toLowerCase().trim().contains(queryText)) {
+                    if(i.title.lowercase().trim().contains(queryText) || i.artist.lowercase().trim().contains(queryText)) {
                         filteredList.add(i)
                     }
                 }

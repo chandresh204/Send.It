@@ -21,6 +21,7 @@ import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import chad.orionsoft.sendit.databinding.ActivitySendImagesBinding
@@ -94,6 +95,7 @@ class SendActivityImagesQ : AppCompatActivity() {
 
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun sendImages(v:View) {
         v.id
         if(selectedSize == 0L) {
@@ -127,6 +129,7 @@ class SendActivityImagesQ : AppCompatActivity() {
         updateBelowBar()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun showPopUpMenu(v: View) {
         val themeCtx= ContextThemeWrapper(applicationContext,R.style.SenderTheme_NoActionBar)
         val popup= PopupMenu(themeCtx,v)
@@ -177,7 +180,6 @@ class SendActivityImagesQ : AppCompatActivity() {
         override fun getItemCount(): Int = images.size
 
         @RequiresApi(Build.VERSION_CODES.Q)
-        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
         override fun onBindViewHolder(holder: IHolder, position: Int) {
             val image=images[position]
             val imageView=holder.imageView
@@ -185,7 +187,7 @@ class SendActivityImagesQ : AppCompatActivity() {
             val selectionMark=holder.selectionMark
 
             try {
-                GlobalScope.launch (Dispatchers.Main){
+                CoroutineScope(Dispatchers.Main).launch {
                     val bMap = loadThumbnailAsync(image.uri).await()
                     imageView.setImageBitmap(bMap)
                     imageView.animate().apply {
@@ -194,7 +196,11 @@ class SendActivityImagesQ : AppCompatActivity() {
                     }
                 }
             } catch (e:Exception) {
-                imageView.setImageDrawable(resources.getDrawable(R.drawable.image_icon_small,resources.newTheme()))
+                imageView.setImageDrawable(
+                    ResourcesCompat.getDrawable(
+                        this@SendActivityImagesQ.resources,
+                        R.drawable.image_icon_small,
+                        this@SendActivityImagesQ.theme))
             }
             eyeImage.setOnClickListener {
                 val i= Intent(applicationContext, ViewImageQ::class.java)

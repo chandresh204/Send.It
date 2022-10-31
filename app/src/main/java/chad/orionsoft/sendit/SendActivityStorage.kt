@@ -17,6 +17,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import chad.orionsoft.sendit.databinding.ActivitySendStorageBinding
@@ -60,6 +61,7 @@ class SendActivityStorage : AppCompatActivity() {
                             selectedFiles ++
                             selectedSize += size.toLong()
                         }
+                        cur.close()
                     }
                     updateBelowBar()
                     fAdapter = FileAdapter(fList)
@@ -67,7 +69,7 @@ class SendActivityStorage : AppCompatActivity() {
                     return@registerForActivityResult
                 }
                 val cur = resolver.query(dataInt?.data!!, null, null, null, null)
-                if (cur!!.moveToFirst()) {
+                if (cur != null && cur.moveToFirst()) {
                     val titleIndex = cur.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME)
                     val sizeIndex = cur.getColumnIndex(MediaStore.Files.FileColumns.SIZE)
                     val title = cur.getString(titleIndex)
@@ -77,6 +79,7 @@ class SendActivityStorage : AppCompatActivity() {
                     selectedSize += size.toLong()
                     updateBelowBar()
                 }
+                cur?.close()
                 fAdapter = FileAdapter(fList)
                 binding.storageRecycler.adapter = fAdapter
             }
@@ -92,6 +95,7 @@ class SendActivityStorage : AppCompatActivity() {
 
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun startSending(v:View) {
         v.id
         if (!Connection.connection) {
@@ -144,7 +148,7 @@ class SendActivityStorage : AppCompatActivity() {
         super.onResume()
     }
 
-    inner class FileAdapter(val fList:ArrayList<FileObjectQ>) : RecyclerView.Adapter<FileAdapter.FileHolder>() {
+    inner class FileAdapter(private val fList:ArrayList<FileObjectQ>) : RecyclerView.Adapter<FileAdapter.FileHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FileHolder {
             return FileHolder(layoutInflater.inflate(R.layout.item_layout_file, parent, false))
@@ -165,20 +169,36 @@ class SendActivityStorage : AppCompatActivity() {
             sizeTextView.text = Connection.formatDataString(fObject.size, ' ')
             iconImageView.setImageDrawable(Connection.findICONSmall(applicationContext,fObject.fileName))
             if (fObject.isSelected) {
-                itemlayout.background = resources.getDrawable(R.drawable.item_background_select)
+                itemlayout.background =
+                    ResourcesCompat.getDrawable(
+                        this@SendActivityStorage.resources,
+                        R.drawable.item_background_select,
+                        this@SendActivityStorage.theme)
             } else {
-                itemlayout.background = resources.getDrawable(R.drawable.item_background)
+                itemlayout.background =
+                    ResourcesCompat.getDrawable(
+                        this@SendActivityStorage.resources,
+                        R.drawable.item_background,
+                        this@SendActivityStorage.theme)
             }
             itemlayout.setOnClickListener {
                 if(fObject.isSelected) {
                     fObject.isSelected = false
-                    itemlayout.background = resources.getDrawable(R.drawable.item_background)
+                    itemlayout.background =
+                        ResourcesCompat.getDrawable(
+                            this@SendActivityStorage.resources,
+                            R.drawable.item_background,
+                            this@SendActivityStorage.theme)
                     selectedFiles --
                     selectedSize -= fObject.size
                     updateBelowBar()
                 } else {
                     fObject.isSelected = true
-                    itemlayout.background = resources.getDrawable(R.drawable.item_background_select)
+                    itemlayout.background =
+                        ResourcesCompat.getDrawable(
+                            this@SendActivityStorage.resources,
+                            R.drawable.item_background_select,
+                            this@SendActivityStorage.theme)
                     selectedFiles ++
                     selectedSize += fObject.size
                     updateBelowBar()

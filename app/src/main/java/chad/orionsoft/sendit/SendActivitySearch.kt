@@ -47,7 +47,7 @@ class SendActivitySearch : AppCompatActivity() {
         selectedSize = 0
         updateBelowBar()
         binding.searchProgressBar.visibility = View.VISIBLE
-        GlobalScope.launch(Dispatchers.Main) {
+        CoroutineScope(Dispatchers.Main).launch {
             getSearchResultsAsync(File(Environment.getExternalStorageDirectory(), ""), query).await()
             binding.searchProgressBar.visibility = View.GONE
             if (searchedFiles.size == 0) {
@@ -97,9 +97,9 @@ class SendActivitySearch : AppCompatActivity() {
     }
 
     private fun makeSearchResults(dir:File,query: String) {
-        val list=dir.listFiles()
+        val list=dir.listFiles() ?: emptyArray()
         var noMedia=false
-        for(name in dir.list()) {
+        for(name in (dir.list() ?: emptyArray())) {
             if(name==".nomedia") {
                 noMedia=true
                 break
@@ -110,7 +110,7 @@ class SendActivitySearch : AppCompatActivity() {
                 if(i.isDirectory && !i.isHidden) {
                     makeSearchResults(i,query)
                 } else{
-                    if(i.name.trim().toLowerCase().contains(query.toLowerCase()) && !i.isHidden) {
+                    if(i.name.trim().lowercase().contains(query.lowercase()) && !i.isHidden) {
                         searchedFiles.add(FileObject(i.path,false))
                     }
                 }
@@ -128,7 +128,9 @@ class SendActivitySearch : AppCompatActivity() {
     companion object {
         var selectedSize:Long=0
         var selectedFiles=0
+        @SuppressLint("StaticFieldLeak")
         lateinit var belowBarText: TextView
+        @SuppressLint("StaticFieldLeak")
         lateinit var nothingFoundText: TextView
 
         @SuppressLint("SetTextI18n")

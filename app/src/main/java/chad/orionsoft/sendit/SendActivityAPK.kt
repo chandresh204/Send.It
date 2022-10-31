@@ -101,7 +101,7 @@ class SendActivityAPK : AppCompatActivity() {
         appArray.clear()
         showTextOnBelowBar("Searching for APKs, please Wait....")
         binding.appListLoadingProgressbar.visibility=View.VISIBLE
-        GlobalScope.launch(Dispatchers.Main) {
+        CoroutineScope(Dispatchers.Main).launch(Dispatchers.Main) {
             waitForArrayToPrepareAsync().await()
             binding.appRecyclerView.layoutManager=LinearLayoutManager(applicationContext)
             binding.appRecyclerView.recycledViewPool.setMaxRecycledViews(0,0)
@@ -279,7 +279,7 @@ class SendActivityAPK : AppCompatActivity() {
             override fun performFiltering(p0: CharSequence?): FilterResults {
                 val filteredList=ArrayList<Companion.AppObject>()
                 for(i in fullAppList) {
-                    if(i.appName.toLowerCase().trim().contains(p0!!)) {
+                    if(i.appName.lowercase().trim().contains(p0!!)) {
                         filteredList.add(i)
                     }
                 }

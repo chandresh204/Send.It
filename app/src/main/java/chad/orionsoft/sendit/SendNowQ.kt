@@ -3,9 +3,9 @@ package chad.orionsoft.sendit
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -13,6 +13,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import chad.orionsoft.sendit.databinding.ActivitySendNowBinding
@@ -21,6 +22,7 @@ import kotlinx.coroutines.*
 import java.lang.Exception
 import java.lang.Runnable
 import java.net.Socket
+import kotlin.math.roundToInt
 
 class SendNowQ : AppCompatActivity() {
 
@@ -59,8 +61,8 @@ class SendNowQ : AppCompatActivity() {
         sAdapter=SendAdapterQ(sendList)
         binding.sendNowRecyclerView.adapter=sAdapter
         binding.sendNowRecyclerView.recycledViewPool.setMaxRecycledViews(0,0)
-        GlobalScope.launch(Dispatchers.Main) {
-            val res=sendFilesOnTCPAsyncQ(sendList).await()
+        CoroutineScope(Dispatchers.Main).launch {
+            val res=sendFilesOnTCPAsync(sendList).await()
             Toast.makeText(applicationContext,res, Toast.LENGTH_SHORT).show()
             if(res.contains("error")) {
                 layoutChangeHandler.obtainMessage(0, ERROR_LAYOUT).sendToTarget()
@@ -76,10 +78,11 @@ class SendNowQ : AppCompatActivity() {
             val msg=it.obj as String
             operation+="$msg\n"
             binding.operationText.text=operation
+            Log.d("Operation", msg)
             true
         }
 
-        layoutChangeHandler=Handler {
+        layoutChangeHandler= Handler(mainLooper) {
             when(it.obj as Int) {
                 SHOW_LAYOUT -> {
 
@@ -88,13 +91,17 @@ class SendNowQ : AppCompatActivity() {
                     binding2.sendingFileStatus.visibility= View.GONE
                     binding2.fileSkippingButton.visibility= View.GONE
                     binding2.sendingStopButton.visibility= View.GONE
-                    val averageSpeed=Math.round(totalSentBytes/operationTime)
+                    val averageSpeed= (totalSentBytes / operationTime).roundToInt()
                     binding2.sendingSpeed.text="average: \n${Connection.formatDataString(averageSpeed.toLong(),' ')}ps"
-                    val finishIcon= if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                /*    val finishIcon= if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         resources.getDrawable(R.drawable.finished_icon,resources.newTheme())
                     } else {
                         resources.getDrawable(R.drawable.finished_icon)
-                    }
+                    }  */
+                    val finishIcon= ResourcesCompat.getDrawable(
+                        this@SendNowQ.resources,
+                        R.drawable.finished_icon,
+                        this@SendNowQ.theme)
                     Animator.flipDrawable(binding2.sendingThumbnail,finishIcon,200)
                     binding2.sendingThumbnail.setOnClickListener {
                         finish()
@@ -102,7 +109,7 @@ class SendNowQ : AppCompatActivity() {
                     binding2.sendingTime.text="$operationTime s\n${Connection.formatDataString(totalSentBytes,'\n')}"
                 }
                 ERROR_LAYOUT -> {
-                    binding2.sendingFilename.text="An Error occured, the App will be stopped in 5 seconds"
+                    binding2.sendingFilename.text="An Error occurred, the App will be stopped in 5 seconds"
                     binding2.root.setBackgroundColor(Color.RED)
                     fileNameHandler.postDelayed({
                         android.os.Process.killProcess(android.os.Process.myPid())
@@ -113,19 +120,19 @@ class SendNowQ : AppCompatActivity() {
             true
         }
 
-        fileNameHandler=Handler {
+        fileNameHandler=Handler(mainLooper) {
             val msg=it.obj as String
             binding2.sendingFilename.text=msg
             true
         }
 
-        fileIconHandler=Handler {
+        fileIconHandler=Handler(mainLooper) {
             val drawable=it.obj as Drawable
             Animator.flipDrawable(binding2.sendingThumbnail,drawable,200)
             true
         }
 
-        fileSentUpdate=Handler {
+        fileSentUpdate=Handler(mainLooper) {
             val length=it.obj as Long
             val update="${Connection.formatDataString(length,' ')} / ${Connection.formatDataString(currentFileSize,' ')}"
             binding2.sendingFileStatus.text=update
@@ -135,7 +142,7 @@ class SendNowQ : AppCompatActivity() {
             true
         }
 
-        removeItemFromRecyclerView=Handler {
+        removeItemFromRecyclerView= Handler(mainLooper) {
             it.obj as Int
             sendList.removeAt(0)
             sAdapter.notifyItemRemoved(0)
@@ -143,7 +150,7 @@ class SendNowQ : AppCompatActivity() {
             true
         }
 
-        timeAndSpeedCountHandler= Handler()
+        timeAndSpeedCountHandler= Handler(mainLooper)
         timeAndSpeedRunnable=object: Runnable {
 
             override fun run() {
@@ -195,15 +202,15 @@ class SendNowQ : AppCompatActivity() {
         }
     }
 
-    private suspend fun sendFilesOnTCPAsyncQ(selectedItems:ArrayList<SendObjectQ>) : Deferred<String> =
+    private suspend fun sendFilesOnTCPAsync(selectedItems:ArrayList<SendObjectQ>) : Deferred<String> =
         coroutineScope {
-            async(Dispatchers.IO + parentJob) {
+            async(Dispatchers.IO) {
                 var res:String
                 val sendObjects=ArrayList<SendObjectQ>()
                 sendObjects.addAll(selectedItems)
                 try {
 
-                    //create Sokcet
+                    //create Socket
                     val socket= Socket(Connection.partnerAddress, Connection.receiverPort)
                     Connection.mode= Connection.MODE_SENDER
                     val sendStream=socket.getOutputStream()
@@ -263,6 +270,7 @@ class SendNowQ : AppCompatActivity() {
                             operationHandler.obtainMessage(0,"receiver ready to accept").sendToTarget()
                             // val stream= sendObjects[i].file.inputStream()
                             val stream = contentResolver.openInputStream(sendObjects[i].uri)
+                            Log.d("availableStream", "${stream?.available()}")
                             var loops=0
                             //start sending stream
                             skipFile=false
@@ -319,7 +327,6 @@ class SendNowQ : AppCompatActivity() {
         }
 
     companion object {
-        val parentJob= Job()
         const val SHOW_LAYOUT=1
         const val FINISH_LAYOUT=2
         const val ERROR_LAYOUT=3

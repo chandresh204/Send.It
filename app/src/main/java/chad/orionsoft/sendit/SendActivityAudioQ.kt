@@ -1,7 +1,6 @@
 package chad.orionsoft.sendit
 
 import android.annotation.SuppressLint
-import android.annotation.TargetApi
 import android.content.ContentUris
 import android.content.Intent
 import android.graphics.Bitmap
@@ -18,6 +17,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import chad.orionsoft.sendit.databinding.ActivitySendAudioBinding
@@ -62,7 +62,6 @@ class SendActivityAudioQ : AppCompatActivity() {
         binding.toolbarTextAudio.setOnClickListener {  }
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private fun generateAudioListQ() {
         val audioUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
         val albumUri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI
@@ -128,6 +127,7 @@ class SendActivityAudioQ : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun selectAll() {
         selectedAudioFiles=0
         selectedSize=0
@@ -140,6 +140,7 @@ class SendActivityAudioQ : AppCompatActivity() {
         aAdapter.notifyDataSetChanged()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun clearAll() {
         for(i in audioList) {
             i.isSelected=false
@@ -196,6 +197,7 @@ class SendActivityAudioQ : AppCompatActivity() {
     }
 
     fun goBack(v: View) {
+        v.id
         onBackPressed()
     }
 
@@ -225,7 +227,6 @@ class SendActivityAudioQ : AppCompatActivity() {
         override fun getItemCount(): Int = aList.size
 
         @RequiresApi(Build.VERSION_CODES.Q)
-        @TargetApi(Build.VERSION_CODES.LOLLIPOP)
         @SuppressLint("SetTextI18n")
         override fun onBindViewHolder(holder: AudioHolder, position: Int) {
             val audioItemLayout=holder.audioItemLayout
@@ -237,18 +238,30 @@ class SendActivityAudioQ : AppCompatActivity() {
             titleText.text=aList[position].title
 
             if(aList[position].isSelected) {
-                audioItemLayout.background=resources.getDrawable(R.drawable.item_background_select)
+                audioItemLayout.background=
+                    ResourcesCompat.getDrawable(
+                        this@SendActivityAudioQ.resources,
+                        R.drawable.item_background_select,
+                        this@SendActivityAudioQ.theme)
                 titleText.isSelected=true
                 artistText.isSelected=true
             } else {
-                audioItemLayout.background=resources.getDrawable(R.drawable.item_background)
+                audioItemLayout.background =
+                    ResourcesCompat.getDrawable(
+                        this@SendActivityAudioQ.resources,
+                        R.drawable.item_background,
+                        this@SendActivityAudioQ.theme)
                 titleText.isSelected=false
                 artistText.isSelected=false
             }
             audioItemLayout.setOnClickListener {
                 if(aList[position].isSelected) {
                     aList[position].isSelected=false
-                    audioItemLayout.background=resources.getDrawable(R.drawable.item_background)
+                    audioItemLayout.background=
+                        ResourcesCompat.getDrawable(
+                            this@SendActivityAudioQ.resources,
+                            R.drawable.item_background,
+                            this@SendActivityAudioQ.theme)
                     titleText.isSelected=false
                     artistText.isSelected=false
                     selectedAudioFiles--
@@ -256,7 +269,11 @@ class SendActivityAudioQ : AppCompatActivity() {
                     updateBelowBar()
                 } else {
                     aList[position].isSelected=true
-                    audioItemLayout.background=resources.getDrawable(R.drawable.item_background_select)
+                    audioItemLayout.background=
+                        ResourcesCompat.getDrawable(
+                            this@SendActivityAudioQ.resources,
+                            R.drawable.item_background_select,
+                            this@SendActivityAudioQ.theme)
                     titleText.isSelected=true
                     artistText.isSelected=true
                     selectedAudioFiles++
@@ -272,8 +289,8 @@ class SendActivityAudioQ : AppCompatActivity() {
                 artistText.text=aList[position].artist
             }
 
-            GlobalScope.launch (Dispatchers.Main) {
-                val bMap = loadThumbnail(aList[position].albumArt).await()
+            CoroutineScope(Dispatchers.Main).launch (Dispatchers.Main) {
+                val bMap = loadThumbnailAsync(aList[position].albumArt).await()
                 albumArt.setImageBitmap(bMap)
             }
             infoText.text="${Connection.formatDuration(aList[position].duration)}  ${Connection.formatDataString(aList[position].size,' ')}"
@@ -302,9 +319,9 @@ class SendActivityAudioQ : AppCompatActivity() {
 
             override fun performFiltering(p0: CharSequence?): FilterResults {
                 val filteredList=ArrayList<AudioObjectQ>()
-                val queryText=p0.toString().toLowerCase()
+                val queryText=p0.toString().lowercase()
                 for(i in fullList) {
-                    if(i.title.toLowerCase().trim().contains(queryText) || i.artist.toLowerCase().trim().contains(queryText)) {
+                    if(i.title.lowercase().trim().contains(queryText) || i.artist.lowercase().trim().contains(queryText)) {
                         filteredList.add(i)
                     }
                 }
@@ -313,6 +330,7 @@ class SendActivityAudioQ : AppCompatActivity() {
                 return filterResults
             }
 
+            @SuppressLint("NotifyDataSetChanged")
             override fun publishResults(p0: CharSequence?, p1: FilterResults?) {
                 aList.clear()
                 aList.addAll(p1?.values as ArrayList<AudioObjectQ>)
@@ -327,7 +345,7 @@ class SendActivityAudioQ : AppCompatActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    private suspend fun loadThumbnail(albumArt: Uri) : Deferred<Bitmap> =
+    private suspend fun loadThumbnailAsync(albumArt: Uri) : Deferred<Bitmap> =
         coroutineScope {
             async (Dispatchers.IO) {
                 return@async try {

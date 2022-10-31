@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.core.content.FileProvider
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 
 class FileRecyAdapter(private val files:ArrayList<FileObject>,private val ctx: Context,private val mode:Int) :
@@ -37,18 +38,21 @@ class FileRecyAdapter(private val files:ArrayList<FileObject>,private val ctx: C
         if(file.isSelected) {
             fileName.isSelected=true
             filePath.isSelected=true
-            fileLayout.background=ctx.resources.getDrawable(R.drawable.item_background_select)
+            fileLayout.background=
+                ResourcesCompat.getDrawable(ctx.resources, R.drawable.item_background_select, ctx.resources.newTheme())
         } else {
             fileName.isSelected=false
             filePath.isSelected=false
-            fileLayout.background=ctx.resources.getDrawable(R.drawable.item_background)
+            fileLayout.background=
+                ResourcesCompat.getDrawable(ctx.resources, R.drawable.item_background, ctx.resources.newTheme())
         }
         fileLayout.setOnClickListener {
             if(file.isSelected) {
                 file.isSelected=false
                 fileName.isSelected=false
                 filePath.isSelected=false
-                fileLayout.background=ctx.resources.getDrawable(R.drawable.item_background)
+                fileLayout.background=
+                    ResourcesCompat.getDrawable(ctx.resources, R.drawable.item_background, ctx.resources.newTheme())
                 when(mode) {
                     MODE_PDF -> {
                         SendActivityPDF.selectedFiles--
@@ -70,7 +74,8 @@ class FileRecyAdapter(private val files:ArrayList<FileObject>,private val ctx: C
                 file.isSelected=true
                 fileName.isSelected=true
                 filePath.isSelected=true
-                fileLayout.background=ctx.resources.getDrawable(R.drawable.item_background_select)
+                fileLayout.background=
+                    ResourcesCompat.getDrawable(ctx.resources, R.drawable.item_background_select, ctx.resources.newTheme())
                 when(mode) {
                     MODE_PDF -> {
                         SendActivityPDF.selectedFiles++
@@ -120,7 +125,9 @@ class FileRecyAdapter(private val files:ArrayList<FileObject>,private val ctx: C
 
         override fun publishResults(p0: CharSequence?, p1: FilterResults?) {
             files.clear()
-            files.addAll(p1?.values as ArrayList<FileObject>)
+            if (p1 != null) {
+                files.addAll(p1.values as ArrayList<FileObject>)
+            }
             when(mode) {
                 MODE_PDF -> {
                     if(files.size==0)

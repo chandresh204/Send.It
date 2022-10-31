@@ -59,9 +59,9 @@ class SendActivityOffice : AppCompatActivity() {
     }
 
     private fun getOffices(dir: File) {
-        val list=dir.listFiles()
+        val list = dir.listFiles() ?: emptyArray()
         var noMedia=false
-        for(name in dir.list()) {
+        for(name in (dir.list() ?: emptyArray())) {
             if(name==".nomedia") {
                 noMedia=true
                 break
@@ -128,6 +128,7 @@ class SendActivityOffice : AppCompatActivity() {
         popupMenu.show()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun selectAll() {
         selectedSize=0
         selectedFiles=0
@@ -140,6 +141,7 @@ class SendActivityOffice : AppCompatActivity() {
         oAdapter.notifyDataSetChanged()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun clearAll() {
         for(i in officeFiles) {
             if(i.isSelected) {
@@ -177,7 +179,9 @@ class SendActivityOffice : AppCompatActivity() {
 
         var selectedSize:Long=0
         var selectedFiles=0
+        @SuppressLint("StaticFieldLeak")
         lateinit var belowBarText: TextView
+        @SuppressLint("StaticFieldLeak")
         lateinit var nothingFoundText:TextView
 
         @SuppressLint("SetTextI18n")

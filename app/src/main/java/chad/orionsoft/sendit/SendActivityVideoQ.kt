@@ -16,6 +16,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import chad.orionsoft.sendit.databinding.ActivitySendVideoBinding
@@ -83,7 +84,7 @@ class SendActivityVideoQ : AppCompatActivity() {
         }
 
         vCursor?.close()
-        videosList.sortBy { it.title.toLowerCase() }
+        videosList.sortBy { it.title.lowercase() }
         binding.videoRecyclerView.layoutManager= LinearLayoutManager(applicationContext)
         vAdapter=VideoAdapterQ(videosList)
         binding.videoRecyclerView.adapter=vAdapter
@@ -107,6 +108,7 @@ class SendActivityVideoQ : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun selectAll() {
         selectedSize=0
         selectedVideoFiles=0
@@ -119,6 +121,7 @@ class SendActivityVideoQ : AppCompatActivity() {
         vAdapter.notifyDataSetChanged()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun clearAll() {
         for(i in videosList) {
             i.isSelected=false
@@ -218,33 +221,58 @@ class SendActivityVideoQ : AppCompatActivity() {
                         Connection.formatDataString(videos[position].size,' ')
 
             try {
-                GlobalScope.launch (Dispatchers.Main){
-                    val bMap = loadThumbnail(videos[position].uri).await()
+                CoroutineScope(Dispatchers.Main).launch {
+                    val bMap = loadThumbnailAsync(videos[position].uri).await()
                     videoThumb.setImageBitmap(bMap)
                 }
             } catch (ex: Exception) {
-                videoThumb.setImageDrawable(resources.getDrawable(R.drawable.video_icon_small,resources.newTheme()))
+                videoThumb.setImageDrawable(
+                    ResourcesCompat.getDrawable(
+                        this@SendActivityVideoQ.resources,
+                        R.drawable.video_icon_small,
+                        this@SendActivityVideoQ.theme
+                    ))
             }
 
             if(videos[position].isSelected) {
-                videoItemLayout.background=resources.getDrawable(R.drawable.item_background_select,resources.newTheme())
+                videoItemLayout.background=
+                    ResourcesCompat.getDrawable(
+                        this@SendActivityVideoQ.resources,
+                        R.drawable.item_background_select,
+                        this@SendActivityVideoQ.theme
+                    )
                 videoTitle.isSelected=true
             } else {
-                videoItemLayout.background=resources.getDrawable(R.drawable.item_background,resources.newTheme())
+                videoItemLayout.background =
+                    ResourcesCompat.getDrawable(
+                        this@SendActivityVideoQ.resources,
+                        R.drawable.item_background,
+                        this@SendActivityVideoQ.theme
+                    )
                 videoTitle.isSelected=false
             }
 
             videoItemLayout.setOnClickListener {
                 if(videos[position].isSelected) {
                     videos[position].isSelected=false
-                    videoItemLayout.background=resources.getDrawable(R.drawable.item_background,resources.newTheme())
+                    videoItemLayout.background=
+                        ResourcesCompat.getDrawable(
+                            this@SendActivityVideoQ.resources,
+                            R.drawable.item_background,
+                            this@SendActivityVideoQ.theme
+                        )
                     videoTitle.isSelected=false
                     selectedSize-=videos[position].size
                     selectedVideoFiles--
                     updateBelowBar()
                 } else {
                     videos[position].isSelected=true
-                    videoItemLayout.background=resources.getDrawable(R.drawable.item_background_select,resources.newTheme())
+                    videoItemLayout.background=
+                        ResourcesCompat.getDrawable(
+                            this@SendActivityVideoQ.resources,
+                            R.drawable.item_background_select,
+                            this@SendActivityVideoQ.theme
+                        )
                     videoTitle.isSelected=true
                     selectedVideoFiles++
                     selectedSize+=videos[position].size
@@ -265,9 +293,9 @@ class SendActivityVideoQ : AppCompatActivity() {
 
             override fun performFiltering(p0: CharSequence?): FilterResults {
                 val filteredList=ArrayList<VideoObjectQ>()
-                val queryText=p0.toString().toLowerCase()
+                val queryText=p0.toString().lowercase()
                 for(i in fullList) {
-                    if(i.title.toLowerCase().trim().contains(queryText)) {
+                    if(i.title.lowercase().trim().contains(queryText)) {
                         filteredList.add(i)
                     }
                 }
@@ -276,6 +304,7 @@ class SendActivityVideoQ : AppCompatActivity() {
                 return filterResults
             }
 
+            @SuppressLint("NotifyDataSetChanged")
             override fun publishResults(p0: CharSequence?, p1: FilterResults?) {
                 videos.clear()
                 videos.addAll(p1?.values as ArrayList<VideoObjectQ>)
@@ -296,7 +325,7 @@ class SendActivityVideoQ : AppCompatActivity() {
         }
     }
 
-    private suspend fun loadThumbnail(uri:Uri): Deferred<Bitmap> =
+    private suspend fun loadThumbnailAsync(uri:Uri): Deferred<Bitmap> =
         coroutineScope {
             async(Dispatchers.IO) {
                 return@async try {

@@ -6,6 +6,8 @@ import android.graphics.PointF
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
+import kotlin.math.abs
+import kotlin.math.min
 
 class FullImageView : androidx.appcompat.widget.AppCompatImageView {
 
@@ -58,8 +60,8 @@ class FullImageView : androidx.appcompat.widget.AppCompatImageView {
                 }
                 MotionEvent.ACTION_UP -> {
                     mode= NONE
-                    val xDiff=Math.abs(curr.x-start.x).toInt()
-                    val yDiff=Math.abs(curr.y - start.y).toInt()
+                    val xDiff= abs(curr.x-start.x).toInt()
+                    val yDiff= abs(curr.y - start.y).toInt()
                     if(xDiff<CLICK && yDiff< CLICK)
                         performClick()
                 }
@@ -91,7 +93,7 @@ class FullImageView : androidx.appcompat.widget.AppCompatImageView {
             val bmHeight=drawable.intrinsicHeight
             val scaleX=viewWidth/bmWidth
             val scaleY=viewHeight/bmHeight
-            val scale=Math.min(scaleX,scaleY)
+            val scale= min(scaleX,scaleY)
             mat.setScale(scale,scale)
 
             var redundantYSpace=viewHeight-(scale*bmHeight)

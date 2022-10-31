@@ -18,8 +18,8 @@ class VideoPlayer : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityVideoPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        title=intent.getStringExtra("title")!!
-        path=intent.getStringExtra("path")!!
+        title=intent.getStringExtra("title") ?: "title"
+        path=intent.getStringExtra("path") ?: "path"
         duration=intent.getIntExtra("duration",0)
 
         binding.videoTitleText.text=title

@@ -16,6 +16,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import chad.orionsoft.sendit.databinding.ActivitySendOptionsBinding
@@ -27,17 +28,19 @@ class SendOptions : AppCompatActivity() {
 
     private val optionList=ArrayList<SendOption>()
     private lateinit var binding: ActivitySendOptionsBinding
+    private lateinit var mainScope: CoroutineScope
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySendOptionsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        mainScope = CoroutineScope(Dispatchers.Main)
         generateOptions()
         binding.sendOptionsBelowBar.isSelected=true
     }
 
     private fun generateOptions() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+     /*   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (Connection.isScoped) {
                 optionList.add(SendOption("IMAGES",resources.getDrawable(R.drawable.image_icon,resources.newTheme())))
                 optionList.add(SendOption("AUDIO",resources.getDrawable(R.drawable.music_icon,resources.newTheme())))
@@ -66,9 +69,39 @@ class SendOptions : AppCompatActivity() {
             optionList.add(SendOption("SEARCH",resources.getDrawable(R.drawable.search_icon)))
             optionList.add(SendOption("SELECT", resources.getDrawable(R.drawable.open_storage)))
             optionList.add(SendOption("RECEIVE",resources.getDrawable(R.drawable.receive_icon_small)))
+        }  */
+
+        if (Connection.isScoped) {
+            optionList.add(SendOption("IMAGES",getDrawableResource(R.drawable.image_icon)))
+            optionList.add(SendOption("AUDIO",getDrawableResource(R.drawable.music_icon)))
+            optionList.add(SendOption("VIDEO",getDrawableResource(R.drawable.video_icon)))
+            optionList.add(SendOption("APK",getDrawableResource(R.drawable.apk_icon)))
+            optionList.add(SendOption("SELECT", getDrawableResource(R.drawable.open_storage)))
+            optionList.add(SendOption("RECEIVE", getDrawableResource(R.drawable.receive_icon_small)))
+        } else {
+            optionList.add(SendOption("IMAGES", getDrawableResource(R.drawable.image_icon)))
+            optionList.add(SendOption("AUDIO", getDrawableResource(R.drawable.music_icon)))
+            optionList.add(SendOption("VIDEO", getDrawableResource(R.drawable.video_icon)))
+            optionList.add(SendOption("APK", getDrawableResource(R.drawable.apk_icon)))
+            optionList.add(SendOption("OFFICE", getDrawableResource(R.drawable.doc_icon)))
+            optionList.add(SendOption("PDF", getDrawableResource(R.drawable.pdf_icon)))
+            optionList.add(SendOption("SEARCH", getDrawableResource(R.drawable.search_icon)))
+            optionList.add(SendOption("SELECT", getDrawableResource(R.drawable.open_storage)))
+            optionList.add(SendOption("RECEIVE", getDrawableResource(R.drawable.receive_icon_small)))
         }
+
+
         binding.sendOptionRecyclerView.layoutManager=GridLayoutManager(applicationContext,3)
         binding.sendOptionRecyclerView.adapter=OAdapter(optionList)
+    }
+
+    private fun getDrawableResource(resId: Int): Drawable {
+        return ResourcesCompat.getDrawable(resources, resId, theme)
+            ?: return ResourcesCompat.getDrawable(
+                resources,
+                R.drawable.sendit_icon_new_small,
+                theme
+            )!!
     }
 
     inner class OAdapter(private val oList:ArrayList<SendOption>) : RecyclerView.Adapter<OAdapter.OHolder>() {
@@ -139,7 +172,7 @@ class SendOptions : AppCompatActivity() {
                                 val sm = getSystemService(Context.STORAGE_STATS_SERVICE) as StorageStatsManager
                                 val myFreeSpace = sm.getFreeBytes(StorageManager.UUID_DEFAULT)
                                 val interchangeMsg = "${Connection.APP_CODE}/*${Connection.MODE_INTERCHANGE}*/$myFreeSpace#"
-                                GlobalScope.launch (Dispatchers.Main) {
+                                mainScope.launch {
                                     val resp = sendMessageAsync(interchangeMsg).await()
                                     Toast.makeText(applicationContext,resp,Toast.LENGTH_SHORT).show()
                                     if(resp==Connection.RECEIVER_OK) {
@@ -151,7 +184,7 @@ class SendOptions : AppCompatActivity() {
                             } else {
                                 val myFreeSpace = File(Environment.getExternalStorageDirectory(),"").freeSpace
                                 val interchangeMsg="${Connection.APP_CODE}/*${Connection.MODE_INTERCHANGE}*/$myFreeSpace#"
-                                GlobalScope.launch (Dispatchers.Main){
+                                mainScope.launch {
                                     val resp = sendMessageAsync(interchangeMsg).await()
                                     Toast.makeText(applicationContext,resp,Toast.LENGTH_SHORT).show()
                                     if(resp==Connection.RECEIVER_OK) {
@@ -205,7 +238,7 @@ class SendOptions : AppCompatActivity() {
                     finishAffinity()
                     return@setPositiveButton
                 }
-                GlobalScope.launch (Dispatchers.Main){
+                mainScope.launch {
                     val msg="${Connection.APP_CODE}/*${Connection.MODE_STOP}*/"
                     val res =sendMessageAsync(msg).await()
                     if(res==Connection.RECEIVER_OK) {

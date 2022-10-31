@@ -99,7 +99,7 @@ class CreateConnectionSender : AppCompatActivity() {
             }
         }
 
-        GlobalScope.launch(Dispatchers.Main + parentJob) {
+        CoroutineScope(Dispatchers.Main).launch(Dispatchers.Main + parentJob) {
             val searchBytes = ("$APP_CODE/*$SEARCH_CODE*/").toByteArray()
             val conRes=testConnectionAsync(searchBytes,100).await()
             if(conRes.contains("error")) {
@@ -117,7 +117,7 @@ class CreateConnectionSender : AppCompatActivity() {
 
     private fun startSearching() {
         code=generateCode()
-        GlobalScope.launch(Dispatchers.Main + parentJob) {
+        CoroutineScope(Dispatchers.Main).launch(Dispatchers.Main + parentJob) {
             while(!Connection.connection) {
                 // setContentView(R.layout.activity_sender)
                 val res = broadcastSearchAsync().await()
@@ -153,7 +153,7 @@ class CreateConnectionSender : AppCompatActivity() {
         var BROAD_ADDR = Connection.BROAD_ADDR
         const val PORT = Connection.receiverPort
         const val NEXT_SIG_END = Connection.NEXT_SIG_END
-        const val CONNCT_SIG = Connection.CONNECT_SIG
+        const val CONNECT_SIG = Connection.CONNECT_SIG
         const val OLD_VER = Connection.OLD_VER
         const val CONN_OK = Connection.CONN_OK
      //   const val DEVICE_DETAILS = Connection.DEVICE_DETAILS
@@ -173,15 +173,14 @@ class CreateConnectionSender : AppCompatActivity() {
         super.onBackPressed()
     }
 
-    private fun getMobileDataState() :Int{
+    private fun getMobileDataState(): Int {
         val tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        val state = tm.dataState
-        return state
+        return tm.dataState
     }
 
     private suspend fun testConnectionAsync(bytes:ByteArray, timeOut:Int) : Deferred<String> =
         coroutineScope {
-            async(Dispatchers.IO + parentJob) {
+            async(Dispatchers.IO) {
                 var res =""
                 if (Connection.BROAD_ADDR != "null") {
                     try {
@@ -217,7 +216,7 @@ class CreateConnectionSender : AppCompatActivity() {
                                         val buff = ByteArray(100)
                                         val receivePacket = DatagramPacket(buff, buff.size)
                                         dSocket.receive(receivePacket)
-                                        val str = String(buff, 0, receivePacket.length)
+                                  //      val str = String(buff, 0, receivePacket.length)
                                         res ="send successfully"
                                         break
                                     } catch (e:Exception) { }
@@ -303,7 +302,7 @@ class CreateConnectionSender : AppCompatActivity() {
                         sendSocket.send(sendPacket)
                         // handler.obtainMessage(0, "next step signal send").sendToTarget()
                         delay(1000)
-                        val connSignal = CONNCT_SIG.toByteArray()
+                        val connSignal = CONNECT_SIG.toByteArray()
                         val sendPacket1 = DatagramPacket(connSignal, connSignal.size, InetAddress.getByName(receiverAddress), PORT)
                         sendSocket.send(sendPacket1)
                         // handler.obtainMessage(0, "Conn signal send to $receiverAddress").sendToTarget()

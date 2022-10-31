@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import chad.orionsoft.sendit.databinding.ActivitySendExBinding
@@ -130,7 +131,10 @@ class SendActivityEX : AppCompatActivity() {
             if(totalSize > Connection.freeSpace) {
                 binding.exBelowBar.setBackgroundColor(Color.RED)
             } else {
-                binding.exBelowBar.setBackgroundColor(resources.getColor(R.color.VioletPrimary))
+                binding.exBelowBar.setBackgroundColor(
+                    ResourcesCompat.getColor(this@SendActivityEX.resources,
+                        R.color.VioletPrimary,
+                        this@SendActivityEX.theme))
             }
             binding.exBelowBar.text = "Sending to :${Connection.partnerName}, Total ${displayList.size}: ${Connection.formatDataString(totalSize,' ')}, " +
                     "free: ${Connection.formatDataString(Connection.freeSpace,' ')}"
@@ -148,6 +152,7 @@ class SendActivityEX : AppCompatActivity() {
 
         override fun getItemCount(): Int = fileList.size
 
+        @SuppressLint("NotifyDataSetChanged")
         override fun onBindViewHolder(holder: FileListHolder, position: Int) {
             val fileIcon= holder.fileIcon
             val fileNameText = holder.fileNameText
@@ -158,7 +163,11 @@ class SendActivityEX : AppCompatActivity() {
             fileNameText.text = fileList[position].title
             fileInfoText.text = fileList[position].info
             fileSizeText.text = Connection.formatDataString(fileList[position].size,' ')
-            cancelButton.setImageDrawable(resources.getDrawable(R.drawable.cancel_icon))
+            cancelButton.setImageDrawable(
+                ResourcesCompat.getDrawable(
+                    this@SendActivityEX.resources,
+                    R.drawable.cancel_icon,
+                    this@SendActivityEX.theme))
             cancelButton.setOnClickListener {
                 if (sendMode == FILE_MODE) {
                     fileListMain.removeAt(position)

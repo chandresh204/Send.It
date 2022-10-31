@@ -2,7 +2,7 @@ package chad.orionsoft.sendit
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.os.Build
+import androidx.core.content.res.ResourcesCompat
 import java.io.File
 import java.net.InetAddress
 import java.util.*
@@ -43,7 +43,7 @@ class Connection {
 
         var connection=false
         var myRandomId =""
-        var broadcastAddress:InetAddress=InetAddress.getByName("192.168.72.255")
+ //       var broadcastAddress:InetAddress=InetAddress.getByName("192.168.72.255")
         var partnerAddress:InetAddress=InetAddress.getByName("")
         var isScoped = false
         var username=""
@@ -53,7 +53,7 @@ class Connection {
         var mode= MODE_RECEIVER
         var maxImageMemAllowed = 10 * 1024 * 1024
 
-        fun findICON(ctx: Context, fileName:String) : Drawable {
+        fun findICON(ctx: Context, fileName:String) : Drawable? {
             val iconResource:Int=
 
             when(File(fileName).extension.lowercase()) {
@@ -122,11 +122,12 @@ class Connection {
                     R.drawable.file_unknown_icon
                 }
             }
-            return if(Build.VERSION.SDK_INT >=Build.VERSION_CODES.LOLLIPOP) {
+         /*   return if(Build.VERSION.SDK_INT >=Build.VERSION_CODES.LOLLIPOP) {
                 ctx.resources.getDrawable(iconResource,ctx.resources.newTheme())
             } else {
                 ctx.resources.getDrawable(iconResource)
-            }
+            }  */
+            return ResourcesCompat.getDrawable(ctx.resources ,iconResource, ctx.resources.newTheme())
 
      /*       if(fileName.toLowerCase().contains(".apk")) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -144,7 +145,7 @@ class Connection {
             return drawable  */
         }
 
-        fun findICONSmall(ctx:Context,fileName:String) : Drawable {
+        fun findICONSmall(ctx:Context,fileName:String) : Drawable? {
             val iconResource:Int=
 
             when(File(fileName).extension.lowercase()) {
@@ -213,11 +214,7 @@ class Connection {
                     R.drawable.file_unknown_icon_small
                 }
             }
-            return if(Build.VERSION.SDK_INT >=Build.VERSION_CODES.LOLLIPOP) {
-                ctx.resources.getDrawable(iconResource,ctx.resources.newTheme())
-            } else {
-                ctx.resources.getDrawable(iconResource)
-            }
+            return ResourcesCompat.getDrawable(ctx.resources, iconResource, ctx.resources.newTheme())
 
         /*    var drawable:Drawable
             if( File(fileName).extension.contains("apk")) {

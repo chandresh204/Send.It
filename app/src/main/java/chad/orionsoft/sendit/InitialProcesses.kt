@@ -1,5 +1,6 @@
 package chad.orionsoft.sendit
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.Drawable
 import kotlinx.coroutines.*
@@ -16,6 +17,7 @@ class InitialProcesses {
     //    private val thumbDir = File(Environment.getExternalStorageDirectory(), "Send_it/.thumbnails")
    //     private val imagesList= ArrayList<ImageObject>()
 
+        @SuppressLint("QueryPermissionsNeeded")
         suspend fun createAppArraysAsync(ctx: Context) =
             coroutineScope {
                 async(Dispatchers.IO) {

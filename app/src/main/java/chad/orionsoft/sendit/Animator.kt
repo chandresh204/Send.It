@@ -31,7 +31,7 @@ class Animator {
             }
         }
 
-        fun flipDrawable(view: ImageView, drawable:Drawable, duration: Long) {
+        fun flipDrawable(view: ImageView, drawable:Drawable?, duration: Long) {
             val pivotX=(view.width/2).toFloat()
             val pivotY=(view.height/2).toFloat()
             val scaleIn=ScaleAnimation(1f,0f,1f,1f,pivotX,pivotY).also {

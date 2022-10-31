@@ -25,6 +25,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import chad.orionsoft.sendit.databinding.ActivityReceiveNewBinding
@@ -60,21 +61,23 @@ class ReceiveNowQ : AppCompatActivity() {
     private lateinit var binding: ActivityReceiveNewBinding
     private lateinit var binding2 : ContentReceiveActivityNewBinding
     private lateinit var binding3 : ItemSendingLayoutBinding
+    private lateinit var mainScope: CoroutineScope
 
     @TargetApi(Build.VERSION_CODES.Q)
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityReceiveNewBinding.inflate(layoutInflater)
         binding2  = binding.contentReceiverActivity
         setContentView(binding.root)
+        mainScope = CoroutineScope(Dispatchers.Main)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setSupportActionBar(binding.toolbar)
         binding2.receiverBelowBarText.isSelected = true
         binding2.receiverBelowBarText.text=
             "receiving from :${Connection.partnerName} , free: ${Connection.formatDataString(getFreeSpace(),' ')}"
         initializeHandler()
-        GlobalScope.launch(Dispatchers.Main + parentJob) {
+        mainScope.launch(Dispatchers.Main + parentJob) {
             val operation=receiveOnTCPAsync().await()
             operationHandler.obtainMessage(0,operation).sendToTarget()
             if(operation.contains("error")) {
@@ -132,7 +135,7 @@ class ReceiveNowQ : AppCompatActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "ClickableViewAccessibility")
     private fun initializeHandler() {
 
         binding3 = binding2.itemReceivingLayout
@@ -160,7 +163,8 @@ class ReceiveNowQ : AppCompatActivity() {
                     timeAndSpeedCountHandler.removeCallbacks(timeAndSpeedRunnable)
                     binding3.sendingFileStatus.visibility= View.GONE
                     Animator.flipDrawable(binding3.sendingThumbnail,
-                        resources.getDrawable(R.drawable.finished_icon,resources.newTheme()) ,200)
+                        ResourcesCompat.getDrawable(this@ReceiveNowQ.resources,
+                            R.drawable.finished_icon, this@ReceiveNowQ.resources.newTheme(),) ,200)
                     binding3.sendingThumbnail.setOnClickListener {
                         Animator.moveDown_OUT(binding3.root,300)
                         operationHandler.postDelayed({
@@ -177,7 +181,7 @@ class ReceiveNowQ : AppCompatActivity() {
                     timeAndSpeedCountHandler.removeCallbacks(timeAndSpeedRunnable)
                     binding3.sendingFileStatus.visibility= View.GONE
                     binding3.root.setBackgroundColor(Color.RED)
-                    binding3.sendingFilename.text="An error occured. receiver will terminate in 5 seconds"
+                    binding3.sendingFilename.text="An error occurred. receiver will terminate in 5 seconds"
                     statusHandler.postDelayed({
                         //     android.os.Process.killProcess(android.os.Process.myPid())
                     },5000)
@@ -264,7 +268,7 @@ class ReceiveNowQ : AppCompatActivity() {
             val itemLayout=holder.itemLayout
             val itemIcon=holder.itemIcon
             val itemSize=holder.itemSize
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+         /*   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 if(items[position].error) {
                     itemLayout.background =
                         resources.getDrawable(R.drawable.item_background_error, resources.newTheme())
@@ -273,6 +277,12 @@ class ReceiveNowQ : AppCompatActivity() {
                 if(items[position].error) {
                     itemLayout.background = resources.getDrawable(R.drawable.item_background_error, theme)
                 }
+            } */
+            if(items[position].error) {
+                itemLayout.background = ResourcesCompat.getDrawable(
+                    this@ReceiveNowQ.resources,
+                    R.drawable.item_background_error,
+                    this@ReceiveNowQ.theme)
             }
             if(position==items.lastIndex) {
                 Animator.moveRight_IN(itemLayout,300)
@@ -337,7 +347,7 @@ class ReceiveNowQ : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.Q)
     private suspend fun receiveOnTCPAsync() : Deferred<String> =
         coroutineScope {
-            async(Dispatchers.IO + parentJob) {
+            async(Dispatchers.IO) {
                 var res=""
                 keepReceiving=true
                 try {
@@ -407,10 +417,10 @@ class ReceiveNowQ : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun receiveFileOnTCP(receiveSocket: Socket, count:Int) : String {
-        var res=""
+        var res: String
         val receiverOKBytes = Connection.RECEIVER_OK.toByteArray()
 
-        //show item_receving_layout
+        //show item_receiving_layout
         layoutChangeHandler.obtainMessage(0,1).sendToTarget()
 
         try {
@@ -524,7 +534,7 @@ class ReceiveNowQ : AppCompatActivity() {
                 itemArray.add(ReceivedObject(newFile,error))
                 addItemInRecyclerView.obtainMessage(0,newFile).sendToTarget() */
             }
-            operationHandler.obtainMessage(0,"Totalreceived:${Connection.formatDataString(totalReceivedBytes,' ')}").sendToTarget()
+            operationHandler.obtainMessage(0,"Total received:${Connection.formatDataString(totalReceivedBytes,' ')}").sendToTarget()
             res="okdone"
         } catch (e:Exception) {
             res = "Error:$e"
@@ -541,7 +551,7 @@ class ReceiveNowQ : AppCompatActivity() {
 
         val type = Connection.getContentTypeFromName(filename)
 
-        var itemUri:Uri? = Uri.parse("Helllo")
+        var itemUri:Uri? = Uri.parse("Hello")
         when(type) {
             Connection.TYPE_IMAGE -> {
                 val values = ContentValues().apply {
@@ -679,7 +689,7 @@ class ReceiveNowQ : AppCompatActivity() {
                 itemArray.add(ReceivedObject(newFile,error))
                 addItemInRecyclerView.obtainMessage(0,newFile).sendToTarget()
             }
-            operationHandler.obtainMessage(0,"Totalreceived:${Connection.formatDataString(totalReceivedBytes,' ')}").sendToTarget()
+            operationHandler.obtainMessage(0,"Total received:${Connection.formatDataString(totalReceivedBytes,' ')}").sendToTarget()
             res="okdone"
 
         } catch (e:Exception) {

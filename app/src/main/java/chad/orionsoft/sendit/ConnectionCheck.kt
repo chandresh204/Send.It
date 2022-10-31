@@ -7,6 +7,7 @@ import android.net.wifi.WifiManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import chad.orionsoft.sendit.databinding.ActivityConnectionCheckBinding
@@ -28,12 +29,13 @@ class ConnectionCheck : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityConnectionCheckBinding.inflate(layoutInflater)
-        setContentView(R.layout.activity_connection_check)
+        setContentView(binding.root)
         deviceMode=intent.getIntExtra(MODE_INTENT_STRING,-1)
         wManager= applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         apMethod=wManager.javaClass.getMethod("getWifiApState")
         apState=apMethod.invoke(wManager) as Int
         updateUI(UI_NOTCONNECTED)
+        Log.d("Checking Connection", "aaaa")
         checkNetwork()
 
         wifiStateChangeReceiver=object: BroadcastReceiver() {
@@ -156,8 +158,8 @@ class ConnectionCheck : AppCompatActivity() {
         val ipByteArray = BigInteger.valueOf(connInfo.toLong()).toByteArray()
         return try {
             val ipString = InetAddress.getByAddress(ipByteArray).hostAddress
-            val lastIndexOfDot = ipString.lastIndexOf('.')
-            ipString.substring(0, lastIndexOfDot) + ".255"
+            val lastIndexOfDot = ipString?.lastIndexOf('.') ?: 0
+            ipString?.substring(0, lastIndexOfDot) + ".255"
         } catch (e: UnknownHostException) {
             "null"
         }

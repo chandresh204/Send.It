@@ -63,9 +63,9 @@ class SendActivityPDF : AppCompatActivity() {
     }
 
     private fun getPDFs(dir: File) {
-        val list=dir.listFiles()
+        val list=dir.listFiles() ?: emptyArray()
         var noMedia=false
-        for(name in dir.list()) {
+        for(name in (dir.list() ?: emptyArray())) {
             if(name==".nomedia") {
                 noMedia=true
                 break
@@ -138,6 +138,7 @@ class SendActivityPDF : AppCompatActivity() {
         popupMenu.show()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun selectAll() {
         selectedSize=0
         selectedFiles=0
@@ -150,6 +151,7 @@ class SendActivityPDF : AppCompatActivity() {
         pAdapter.notifyDataSetChanged()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun clearAll() {
         for(i in pdfFiles) {
             if(i.isSelected) {
@@ -177,7 +179,9 @@ class SendActivityPDF : AppCompatActivity() {
 
         var selectedSize:Long=0
         var selectedFiles=0
+        @SuppressLint("StaticFieldLeak")
         lateinit var belowBarText:TextView
+        @SuppressLint("StaticFieldLeak")
         lateinit var nothingFoundText:TextView
 
         @SuppressLint("SetTextI18n")

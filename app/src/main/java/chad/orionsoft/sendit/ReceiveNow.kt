@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
@@ -20,6 +19,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import chad.orionsoft.sendit.databinding.ActivityReceiveNewBinding
@@ -58,13 +58,15 @@ class ReceiveNow : AppCompatActivity() {
     private lateinit var binding : ActivityReceiveNewBinding
     private lateinit var binding2 : ContentReceiveActivityNewBinding
     private lateinit var binding3 : ItemSendingLayoutBinding
+    private lateinit var mainScope: CoroutineScope
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityReceiveNewBinding.inflate(layoutInflater)
         binding2 = binding.contentReceiverActivity
-        setContentView(R.layout.activity_receive_new)
+        setContentView(binding.root)
+        mainScope = CoroutineScope(Dispatchers.Main)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setSupportActionBar(binding.toolbar)
         appDir= File(Environment.getExternalStorageDirectory(),"Send_it")
@@ -74,7 +76,7 @@ class ReceiveNow : AppCompatActivity() {
         binding2.receiverBelowBarText.text=
                 "receiving from :${Connection.partnerName} , free: ${Connection.formatDataString(appDir.freeSpace,' ')}"
         initializeHandler()
-        GlobalScope.launch(Dispatchers.Main + parentJob) {
+        mainScope.launch(Dispatchers.Main + parentJob) {
             val operation=receiveOnTCPAsync().await()
             operationHandler.obtainMessage(0,operation).sendToTarget()
             if(operation.contains("error")) {
@@ -132,11 +134,11 @@ class ReceiveNow : AppCompatActivity() {
         binding2.receivedItemRecyclerView.adapter=iAdapter
     }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "ClickableViewAccessibility")
     private fun initializeHandler() {
 
         binding3 = binding2.itemReceivingLayout
-        operationHandler=Handler {
+        operationHandler= Handler(mainLooper) {
             val msg=it.obj as String
             operations+="\n$msg"
             binding2.receiverOperations.text=operations
@@ -158,11 +160,13 @@ class ReceiveNow : AppCompatActivity() {
                     binding3.root.setOnTouchListener(onTouchListener)
                     timeAndSpeedCountHandler.removeCallbacks(timeAndSpeedRunnable)
                     binding3.sendingFileStatus.visibility=View.GONE
-                    val doneDrawable= if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                 /*   val doneDrawable=  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         resources.getDrawable(R.drawable.finished_icon,resources.newTheme())
                     } else {
                         resources.getDrawable(R.drawable.finished_icon)
-                    }
+                    }  */
+                    val doneDrawable= ResourcesCompat.getDrawable(this@ReceiveNow.resources, R.drawable.finished_icon,
+                        this@ReceiveNow.resources.newTheme())
                     Animator.flipDrawable(binding3.sendingThumbnail,doneDrawable,200)
                     binding3.sendingThumbnail.setOnClickListener {
                         Animator.moveDown_OUT(binding3.root,300)
@@ -192,7 +196,8 @@ class ReceiveNow : AppCompatActivity() {
         filenameHandler=Handler(mainLooper) {
             val name=it.obj as String
             binding3.sendingFilename.text=name
-            Animator.flipDrawable(binding3.sendingThumbnail, Connection.findICON(applicationContext,name),200)
+            Animator.flipDrawable(
+                binding3.sendingThumbnail, Connection.findICON(applicationContext,name),200)
             true
         }
 
@@ -231,7 +236,7 @@ class ReceiveNow : AppCompatActivity() {
 
     private fun provideFile(filename:String) : File {
         var exists=false
-        val fList=appDir.list()
+        val fList = appDir.list() ?: emptyArray()
         for(i in fList.indices) {
             if(filename==fList[i])
                 exists=true
@@ -260,7 +265,7 @@ class ReceiveNow : AppCompatActivity() {
             val itemLayout=holder.itemLayout
             val itemIcon=holder.itemIcon
             val itemSize=holder.itemSize
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+         /*   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 if(items[position].error) {
                     itemLayout.background =
                         resources.getDrawable(R.drawable.item_background_error, resources.newTheme())
@@ -269,6 +274,11 @@ class ReceiveNow : AppCompatActivity() {
                 if(items[position].error) {
                     itemLayout.background = resources.getDrawable(R.drawable.item_background_error)
                 }
+            }  */
+            if(items[position].error) {
+                itemLayout.background =
+                    ResourcesCompat.getDrawable(this@ReceiveNow.resources,
+                        R.drawable.item_background_error, this@ReceiveNow.resources.newTheme())
             }
             if(position==items.lastIndex) {
                 Animator.moveRight_IN(itemLayout,300)
@@ -316,7 +326,7 @@ class ReceiveNow : AppCompatActivity() {
 
     private suspend fun receiveOnTCPAsync() : Deferred<String> =
             coroutineScope {
-                async(Dispatchers.IO + parentJob) {
+                async(Dispatchers.IO) {
                     var res=""
                     keepReceiving=true
                     try {

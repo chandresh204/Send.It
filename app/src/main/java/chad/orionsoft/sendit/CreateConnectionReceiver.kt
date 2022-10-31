@@ -24,7 +24,7 @@ class CreateConnectionReceiver : AppCompatActivity() {
 
     private var keepSearching=false
     private var test=""
-    //  private lateinit var showSenderRequest: Handler
+
     private lateinit var operationHandler:Handler
     private lateinit var headingHandler:Handler
     private lateinit var uiCodeHandler:Handler
@@ -38,7 +38,7 @@ class CreateConnectionReceiver : AppCompatActivity() {
         setContentView(binding.root)
         keepSearching = true
         initializeHandlers()
-        GlobalScope.launch(Dispatchers.Main + parentJob) {
+        CoroutineScope(Dispatchers.Main).launch(Dispatchers.Main + parentJob) {
             val operation = waitSenderAsync().await()
             if (operation.contains("connected")) {
                 setContentView(binding2.root)
@@ -100,7 +100,7 @@ class CreateConnectionReceiver : AppCompatActivity() {
         const val SEARCH_CODE = Connection.SEARCH_CODE
         var MY_NAME = "$APP_CODE/*${Connection.username}*/"
         const val NEXT_SIG_END = Connection.NEXT_SIG_END
-        const val CONNCT_SIG = Connection.CONNECT_SIG
+        const val CONNECT_SIG = Connection.CONNECT_SIG
         const val ASK_CODE_SIG = Connection.ASK_CODE_SIG
         const val CONN_OK = Connection.CONN_OK
         const val OLD_VER = Connection.OLD_VER
@@ -169,7 +169,7 @@ class CreateConnectionReceiver : AppCompatActivity() {
                         val got = String(buff, 0, receivePacket.length)
                         operationHandler.obtainMessage(0, "got: $got").sendToTarget()
 
-                        if (got.contains(CONNCT_SIG)) {
+                        if (got.contains(CONNECT_SIG)) {
                             // send mac, free space and version details
                             val res1= deviceInfoString().toByteArray()
                             val sendPacket = DatagramPacket(res1, res1.size, senderAddress, senderPort)

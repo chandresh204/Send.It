@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.view.*
 import android.widget.*
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import chad.orionsoft.sendit.databinding.ActivitySendVideoBinding
@@ -103,6 +104,7 @@ class SendActivityVideo : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun selectAll() {
         selectedSize=0
         selectedVideoFiles=0
@@ -115,6 +117,7 @@ class SendActivityVideo : AppCompatActivity() {
         vAdapter.notifyDataSetChanged()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun clearAll() {
         for(i in videosList) {
             i.isSelected=false
@@ -215,11 +218,15 @@ class SendActivityVideo : AppCompatActivity() {
                 "${Connection.formatDuration(videos[position].duration)}  " +
                         Connection.formatDataString(videos[position].fileSize,' ')
 
-            videoThumb.setImageDrawable(resources.getDrawable(R.drawable.video_icon_small))
+            videoThumb.setImageDrawable(
+                ResourcesCompat.getDrawable(
+                    this@SendActivityVideo.resources,
+                    R.drawable.video_icon_small,
+                    this@SendActivityVideo.theme))
             if(thumbMap[videos[position].id] !=null) {
                 videoThumb.setImageBitmap(thumbMap[videos[position].id])
             } else {
-                GlobalScope.launch(Dispatchers.Main) {
+                CoroutineScope(Dispatchers.Main).launch {
                     val id=videos[position].id
                     val thumbnail=loadThumbnailAsync(videos[position].path).await()
                     videoThumb.setImageBitmap(thumbnail)
@@ -229,24 +236,44 @@ class SendActivityVideo : AppCompatActivity() {
 
 
             if(videos[position].isSelected) {
-                videoItemLayout.background=resources.getDrawable(R.drawable.item_background_select)
+                videoItemLayout.background =
+                    ResourcesCompat.getDrawable(
+                        this@SendActivityVideo.resources,
+                        R.drawable.item_background_select,
+                        this@SendActivityVideo.theme
+                    )
                 videoTitle.isSelected=true
             } else {
-                videoItemLayout.background=resources.getDrawable(R.drawable.item_background)
+                videoItemLayout.background=
+                    ResourcesCompat.getDrawable(
+                        this@SendActivityVideo.resources,
+                        R.drawable.item_background,
+                        this@SendActivityVideo.theme
+                    )
                 videoTitle.isSelected=false
             }
 
             videoItemLayout.setOnClickListener {
                 if(videos[position].isSelected) {
                     videos[position].isSelected=false
-                    videoItemLayout.background=resources.getDrawable(R.drawable.item_background)
+                    videoItemLayout.background=
+                        ResourcesCompat.getDrawable(
+                            this@SendActivityVideo.resources,
+                            R.drawable.item_background,
+                            this@SendActivityVideo.theme
+                        )
                     videoTitle.isSelected=false
                     selectedSize-=videos[position].fileSize
                     selectedVideoFiles--
                     updateBelowBar()
                 } else {
                     videos[position].isSelected=true
-                    videoItemLayout.background=resources.getDrawable(R.drawable.item_background_select)
+                    videoItemLayout.background=
+                        ResourcesCompat.getDrawable(
+                            this@SendActivityVideo.resources,
+                            R.drawable.item_background_select,
+                            this@SendActivityVideo.theme
+                        )
                     videoTitle.isSelected=true
                     selectedVideoFiles++
                     selectedSize+=videos[position].fileSize
@@ -278,6 +305,7 @@ class SendActivityVideo : AppCompatActivity() {
                 return filterResults
             }
 
+            @SuppressLint("NotifyDataSetChanged")
             override fun publishResults(p0: CharSequence?, p1: FilterResults?) {
                 videos.clear()
                 videos.addAll(p1?.values as ArrayList<VideoObject>)
