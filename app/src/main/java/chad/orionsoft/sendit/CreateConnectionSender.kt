@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.telephony.TelephonyManager
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
@@ -29,6 +30,7 @@ class CreateConnectionSender : AppCompatActivity() {
     private lateinit var showCodeHandler: Handler
     private var receiverAddress=""
     private var searching = false
+    private var broadcasting = false
     private lateinit var binding: ActivityCreateConnectionBinding
     private lateinit var binding2 : DeviceConnectedLayoutBinding
 
@@ -38,6 +40,7 @@ class CreateConnectionSender : AppCompatActivity() {
         binding = ActivityCreateConnectionBinding.inflate(layoutInflater)
         binding2 = DeviceConnectedLayoutBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        Log.d("CreateConnectionSender", "ON--------------")
         setDataDir(applicationContext)
     /*    testHandler=Handler {
             val msg=it.obj as String
@@ -93,35 +96,41 @@ class CreateConnectionSender : AppCompatActivity() {
         }
 
         binding.cancelButton.setOnClickListener {
+            broadcasting = false
             if (searching) {
                 searching = false
-                parentJob.cancel()
             }
         }
 
-        CoroutineScope(Dispatchers.Main).launch(Dispatchers.Main + parentJob) {
+        CoroutineScope(Dispatchers.Main).launch {
             val searchBytes = ("$APP_CODE/*$SEARCH_CODE*/").toByteArray()
             val conRes=testConnectionAsync(searchBytes,100).await()
+            Log.d("ConRes", conRes)
             if(conRes.contains("error")) {
                 Toast.makeText(applicationContext, conRes,Toast.LENGTH_SHORT).show()
                 binding.buttonRelativeLayout.visibility = View.GONE
                 finish()
             } else {
                 startSearching()
-                binding.cancelButton.setOnClickListener {
+              /*  binding.cancelButton.setOnClickListener {
                     android.os.Process.killProcess(android.os.Process.myPid())
-                }
+                }  */
             }
         }
     }
 
     private fun startSearching() {
         code=generateCode()
-        CoroutineScope(Dispatchers.Main).launch(Dispatchers.Main + parentJob) {
-            while(!Connection.connection) {
+        CoroutineScope(Dispatchers.Main).launch {
+            broadcasting = true
+            while(!Connection.connection && broadcasting) {
                 // setContentView(R.layout.activity_sender)
                 val res = broadcastSearchAsync().await()
                 Toast.makeText(applicationContext,res, Toast.LENGTH_LONG).show()
+                if(res == "Stopped") {
+                    finish()
+                    return@launch
+                }
                 // handler.obtainMessage(0, "End: $res").sendToTarget()
             }
             setContentView(binding2.root)
@@ -143,7 +152,7 @@ class CreateConnectionSender : AppCompatActivity() {
     }
 
     companion object {
-        val parentJob= Job()
+   //     val parentJob= Job()
         lateinit var data1Dir: File
         fun setDataDir(ctx: Context) {
             data1Dir = ctx.getExternalFilesDir( "MAC")!!
@@ -161,14 +170,10 @@ class CreateConnectionSender : AppCompatActivity() {
         const val WRONG_CODE = Connection.WRONG_CODE
     }
 
-    override fun onDestroy() {
-        parentJob.cancel()
- //       android.os.Process.killProcess(android.os.Process.myPid())
-        super.onDestroy()
-    }
 
     override fun onBackPressed() {
-        parentJob.cancel()
+        searching = false
+        broadcasting = false
   //      android.os.Process.killProcess(android.os.Process.myPid())
         super.onBackPressed()
     }
@@ -255,7 +260,7 @@ class CreateConnectionSender : AppCompatActivity() {
             }
         }
 
-    private  suspend fun broadcastSearchAsync() : Deferred<String> =
+    private suspend fun broadcastSearchAsync() : Deferred<String> =
             coroutineScope {
                 async (Dispatchers.IO) {
                     var res:String
@@ -267,7 +272,11 @@ class CreateConnectionSender : AppCompatActivity() {
                         val receiverList = ArrayList<String>()
                         step1 = true
                         while (step1) {
+                            if (!broadcasting) {
+                                break
+                            }
                             try {
+                                Log.d("Sender", "Broadcasting")
                                 sendSocket.soTimeout = 4000
                                 // handler.obtainMessage(0, "Search packet sent").sendToTarget()
                                 sendSocket.send(searchPacket)
@@ -292,6 +301,10 @@ class CreateConnectionSender : AppCompatActivity() {
                             } catch (e:Exception) {
                                 // handler.obtainMessage(0, "no response").sendToTarget()
                             }
+                        }
+
+                        if(!broadcasting) {
+                            return@async "Stopped"
                         }
 
                         //in step 2

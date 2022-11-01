@@ -41,7 +41,8 @@ class SendActivityImagesQ : AppCompatActivity() {
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_send_images)
+        binding = ActivitySendImagesBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         setOutFileDir(applicationContext)
         if(!outfileDir.exists()) {
             outfileDir.mkdirs()

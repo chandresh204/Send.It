@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
 import android.os.storage.StorageManager
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import chad.orionsoft.sendit.databinding.ActivityCreateConnectionReceiverBinding
@@ -38,7 +39,11 @@ class CreateConnectionReceiver : AppCompatActivity() {
         setContentView(binding.root)
         keepSearching = true
         initializeHandlers()
-        CoroutineScope(Dispatchers.Main).launch(Dispatchers.Main + parentJob) {
+        binding.receiverCancelButton.setOnClickListener {
+            keepSearching = false
+            finish()
+        }
+        CoroutineScope(Dispatchers.Main).launch {
             val operation = waitSenderAsync().await()
             if (operation.contains("connected")) {
                 setContentView(binding2.root)
@@ -54,6 +59,7 @@ class CreateConnectionReceiver : AppCompatActivity() {
                 },1000)
             } else if(operation.contains("Error")) {
                 Toast.makeText(applicationContext,operation,Toast.LENGTH_SHORT).show()
+                Log.e("Receiver", operation)
             }
             finish()
             }
@@ -92,7 +98,7 @@ class CreateConnectionReceiver : AppCompatActivity() {
     }
 
     companion object {
-        val parentJob= Job()
+     //   val parentJob= Job()
         var isCodeSet = false
         var RES_CODE =""
         const val APP_CODE = Connection.APP_CODE
@@ -131,6 +137,13 @@ class CreateConnectionReceiver : AppCompatActivity() {
                         // prepare datagram socket
                         val recSocket = DatagramSocket(PORT)
                         recSocket.soTimeout = 60000
+                        CoroutineScope(Dispatchers.IO).launch {
+                            watchReceiverSocketAsync().await()
+                            if(!recSocket.isClosed) {
+                                recSocket.close()
+                                Log.d("Receiver", "Socket closed")
+                            }
+                        }
                         var inStep1 = true
                         var buff= ByteArray(1024)
                         var receivePacket = DatagramPacket(buff, buff.size)
@@ -138,7 +151,11 @@ class CreateConnectionReceiver : AppCompatActivity() {
 
                         // in step 1
                         while(inStep1) {
+                            Log.d("Receiver", "Searching")
                             recSocket.receive(receivePacket)
+                            if (!keepSearching) {
+                                break
+                            }
                             val senderAddress = receivePacket.address
                             val senderPort = receivePacket.port
                             val got = String(buff, 0, receivePacket.length)
@@ -156,6 +173,10 @@ class CreateConnectionReceiver : AppCompatActivity() {
                                 operationHandler.obtainMessage(0, "Sender: $senderName").sendToTarget()
                                 inStep1 = false
                             }
+                        }
+
+                        if (!keepSearching) {
+                            return@async "Stopped"
                         }
 
                         //in step 2
@@ -222,4 +243,14 @@ class CreateConnectionReceiver : AppCompatActivity() {
                     return@async res
                 }
             }
+
+    private suspend fun watchReceiverSocketAsync() =
+        coroutineScope {
+            async(Dispatchers.IO) {
+                while(keepSearching) {
+                    delay(2000)
+                }
+                Log.d("Receiver", "Socket can be closed")
+            }
+        }
 }
