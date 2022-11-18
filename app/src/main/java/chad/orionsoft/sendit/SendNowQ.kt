@@ -274,7 +274,10 @@ class SendNowQ : AppCompatActivity() {
                             var loops=0
                             //start sending stream
                             skipFile=false
-                            while(stream!!.available()>0 && !skipFile) {
+
+
+                            // stream.available = 0 for large this needs to be changed.
+                     /*       while(stream!!.available()>0 && !skipFile) {
                                 val fileBuff=ByteArray(4096)
                                 val bytesRead=stream.read(fileBuff)
                                 sendStream.write(fileBuff,0,bytesRead)
@@ -286,7 +289,23 @@ class SendNowQ : AppCompatActivity() {
                                     //update UI
                                     fileSentUpdate.obtainMessage(0,sentBytes).sendToTarget()
                                 }
+                            }  */
+                            while(!skipFile) {
+                                val fileBuff = ByteArray(4096)
+                                val bytesRead = stream?.read(fileBuff) ?: 0
+                                if(bytesRead == 0) break
+                                sendStream.write(fileBuff, 0, bytesRead)
+                                totalSentBytes += bytesRead
+                                sentBytes += bytesRead
+                                loops++
+                                if (loops%200==0) {
+                                    //     operationHandler.obtainMessage(0,"sent:${formatDataString(sentBytes,' ')}").sendToTarget()
+                                    //update UI
+                                    fileSentUpdate.obtainMessage(0,sentBytes).sendToTarget()
+                                }
                             }
+
+
                             fileSentUpdate.obtainMessage(0,sentBytes).sendToTarget()
                             operationHandler.obtainMessage(0,"file sent : $sentBytes").sendToTarget()
                         } else {

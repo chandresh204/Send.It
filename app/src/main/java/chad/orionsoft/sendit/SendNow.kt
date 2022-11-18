@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -78,6 +79,7 @@ class SendNow : AppCompatActivity() {
             val msg=it.obj as String
             operation+="$msg\n"
             binding.operationText.text=operation
+            Log.d("Operation", msg)
             true
         }
 
@@ -269,10 +271,14 @@ class SendNow : AppCompatActivity() {
                         if(responseString.contains(Connection.RECEIVER_OK)) {
                             operationHandler.obtainMessage(0,"receiver ready to accept").sendToTarget()
                             val stream= sendObjects[i].file.inputStream()
+                            Log.d("Operation", "Stream available: ${stream.available()}")
                             var loops=0
                             //start sending stream
                             skipFile=false
-                            while(stream.available()>0 && !skipFile) {
+
+
+                            // stream.available = 0 for large this needs to be changed.
+                      /*      while(stream.available()>0 && !skipFile) {
                                 val fileBuff=ByteArray(4096)
                                 val bytesRead=stream.read(fileBuff)
                                 sendStream.write(fileBuff,0,bytesRead)
@@ -284,7 +290,24 @@ class SendNow : AppCompatActivity() {
                                     //update UI
                                     fileSentUpdate.obtainMessage(0,sentBytes).sendToTarget()
                                 }
+                            } */
+
+                            while (!skipFile) {
+                                val fileBuff= ByteArray(4096)
+                                val bytesRead = stream.read(fileBuff)
+                                if (bytesRead == 0) break
+                                sendStream.write(fileBuff,0, bytesRead)
+                                totalSentBytes += bytesRead
+                                sentBytes += bytesRead
+                                loops++
+                                if(loops%200 == 0) {
+                                    //     operationHandler.obtainMessage(0,"sent:${formatDataString(sentBytes,' ')}").sendToTarget()
+                                    //update UI
+                                    fileSentUpdate.obtainMessage(0,sentBytes).sendToTarget()
+                                }
                             }
+
+
                             fileSentUpdate.obtainMessage(0,sentBytes).sendToTarget()
                             operationHandler.obtainMessage(0,"file sent : $sentBytes").sendToTarget()
                         } else {

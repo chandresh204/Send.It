@@ -83,7 +83,7 @@ class CreateConnectionReceiver : AppCompatActivity() {
                     Toast.makeText(applicationContext,"please enter code to connect", Toast.LENGTH_LONG).show()
                     return@setOnClickListener
                 }
-                RES_CODE = binding.receiverEnterCodeInfo.text.toString()
+                RES_CODE = binding.receiverEnterCodeEdit.text.toString()
                 isCodeSet = true
             }
             true
@@ -93,6 +93,7 @@ class CreateConnectionReceiver : AppCompatActivity() {
             val msg=it.obj as String
             test+="\n$msg"
             binding.dynamicInfo.text=test
+            Log.d("Operation", msg)
             true
         }
     }
@@ -140,7 +141,7 @@ class CreateConnectionReceiver : AppCompatActivity() {
                         CoroutineScope(Dispatchers.IO).launch {
                             watchReceiverSocketAsync().await()
                             if(!recSocket.isClosed) {
-                                recSocket.close()
+                   //             recSocket.close()
                                 Log.d("Receiver", "Socket closed")
                             }
                         }
@@ -207,12 +208,14 @@ class CreateConnectionReceiver : AppCompatActivity() {
                                 while(!isCodeSet) { }
                                 val codeStr = "$APP_CODE&$RES_CODE/*${getFreeSpace()}*/"
                                 val codeBytes = codeStr.toByteArray()
+                                Log.d("Operation", "sending code $codeStr")
                                 val sendPacket1 = DatagramPacket(codeBytes, codeBytes.size, senderAddress, senderPort)
                                 recSocket.send(sendPacket1)
                                 buff = ByteArray(1024)
                                 val receivePacket2 = DatagramPacket(buff, buff.size)
                                 recSocket.receive(receivePacket2)
                                 val got2 = String(buff, 0, receivePacket2.length)
+                                Log.d("Operation", "got response $got2")
                                 if(got2.contains(CONN_OK)) {
                                     operationHandler.obtainMessage(0, "connected").sendToTarget()
                                     Connection.connection = true

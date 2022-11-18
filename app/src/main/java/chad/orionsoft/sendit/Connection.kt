@@ -13,7 +13,7 @@ class Connection {
     companion object {
         const val APP_CODE="sendit004"
         const val MIN_VER_NEED= "210"
-        const val THIS_VER = "220"
+        const val THIS_VER = "221"
         const val RECEIVER_OK="${APP_CODE}_OK"
         const val ON_RECEIVE_RESPONSE="${APP_CODE}_received" //+ "/*freeSpace*/
         const val SENDING_STOP="sender_stop"
