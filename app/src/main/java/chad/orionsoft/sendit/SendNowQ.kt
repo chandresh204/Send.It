@@ -292,8 +292,8 @@ class SendNowQ : AppCompatActivity() {
                             }  */
                             while(!skipFile) {
                                 val fileBuff = ByteArray(4096)
-                                val bytesRead = stream?.read(fileBuff) ?: 0
-                                if(bytesRead == 0) break
+                                val bytesRead = stream?.read(fileBuff) ?: -1
+                                if(bytesRead <= 0) break
                                 sendStream.write(fileBuff, 0, bytesRead)
                                 totalSentBytes += bytesRead
                                 sentBytes += bytesRead

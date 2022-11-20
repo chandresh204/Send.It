@@ -11,7 +11,7 @@ android {
         minSdk 22
         targetSdk 31
         versionCode 2
-        versionName "2.3 Beta"
+        versionName "2.3.01 Beta"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
