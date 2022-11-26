@@ -81,12 +81,14 @@
                 android:name=".ReceiveNow"
                 android:label="Receiving Now"
                 android:screenOrientation="portrait"
+                android:launchMode="singleTop"
                 android:theme="@style/ReceiverTheme.NoActionBar">
         </activity>
         <activity
                 android:name=".ReceiveNowQ"
                 android:label="Receiving Now"
                 android:screenOrientation="portrait"
+                android:launchMode="singleTop"
                 android:theme="@style/ReceiverTheme.NoActionBar">
         </activity>
         <activity

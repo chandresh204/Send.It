@@ -2,6 +2,10 @@ package chad.orionsoft.sendit
 
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.usage.StorageStatsManager
 import android.content.ContentValues
 import android.content.Context
@@ -63,6 +67,11 @@ class ReceiveNowQ : AppCompatActivity() {
     private lateinit var binding3 : ItemSendingLayoutBinding
     private lateinit var mainScope: CoroutineScope
 
+    //for notification
+    private lateinit var nManager : NotificationManager
+    private var notificationId = 10
+    private var notificationFileName = "Receiving"
+
     @TargetApi(Build.VERSION_CODES.Q)
     @SuppressLint("SetTextI18n", "ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,6 +86,7 @@ class ReceiveNowQ : AppCompatActivity() {
         binding2.receiverBelowBarText.text=
             "receiving from :${Connection.partnerName} , free: ${Connection.formatDataString(getFreeSpace(),' ')}"
         initializeHandler()
+        createNotificationChannel()
         mainScope.launch(Dispatchers.Main + parentJob) {
             val operation=receiveOnTCPAsync().await()
             operationHandler.obtainMessage(0,operation).sendToTarget()
@@ -194,14 +204,18 @@ class ReceiveNowQ : AppCompatActivity() {
             val name=it.obj as String
             binding3.sendingFilename.text = name
             Animator.flipDrawable(binding3.sendingThumbnail,Connection.findICON(applicationContext,name),200)
+            notificationFileName = name
+            notificationId++
             true
         }
 
         statusHandler= Handler(mainLooper) {
             val received=it.obj as Long
-            binding3.sendingFileStatus.text="${Connection.formatDataString(received,' ')} / ${Connection.formatDataString(currentFileSize,' ')}"
+            val progressText = "${Connection.formatDataString(received,' ')} / ${Connection.formatDataString(currentFileSize,' ')}"
+            binding3.sendingFileStatus.text= progressText
             val progress=(received*100/currentFileSize).toInt()
             binding3.sendingProgress.progress=progress
+            updateNotification(progress, progressText)
             true
         }
 
@@ -720,6 +734,29 @@ class ReceiveNowQ : AppCompatActivity() {
 
     override fun onBackPressed() {
         confirmExitDialog()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun createNotificationChannel() {
+        nManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        val notificationChannel = NotificationChannel(Connection.NOTIFICATION_CHANNEL_ID,
+            Connection.NOTIFICATION_CHANNEL, NotificationManager.IMPORTANCE_DEFAULT)
+        nManager.createNotificationChannel(notificationChannel)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun updateNotification(progress: Int, contentName: String) {
+        val notification = Notification.Builder(
+            this, Connection.NOTIFICATION_CHANNEL_ID).apply {
+            setSmallIcon(R.drawable.sendit_icon_new_small)
+            setProgress(100, progress, false)
+            setContentTitle(notificationFileName)
+            setContentText(contentName)
+        }.build()
+        notification.contentIntent = PendingIntent.getActivity(
+            this, 0, Intent(this, ReceiveNowQ::class.java),
+            PendingIntent.FLAG_IMMUTABLE)
+        nManager.notify(notificationId, notification)
     }
 
     inner class ReceivedObject(val filename:String, val size:Long, val fileUri:Uri, val error:Boolean) {

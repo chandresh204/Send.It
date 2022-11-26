@@ -53,6 +53,11 @@ class Connection {
         var mode= MODE_RECEIVER
         var maxImageMemAllowed = 10 * 1024 * 1024
 
+        //added for notification
+        const val NOTIFICATION_CHANNEL_ID = "send_it"
+        const val NOTIFICATION_CHANNEL = "send_it_channel"
+
+
         fun findICON(ctx: Context, fileName:String) : Drawable? {
             val iconResource:Int=
 

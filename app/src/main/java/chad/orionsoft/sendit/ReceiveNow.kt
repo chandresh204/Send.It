@@ -1,9 +1,14 @@
 package chad.orionsoft.sendit
 
 import android.annotation.SuppressLint
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
@@ -16,6 +21,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
@@ -60,6 +66,11 @@ class ReceiveNow : AppCompatActivity() {
     private lateinit var binding3 : ItemSendingLayoutBinding
     private lateinit var mainScope: CoroutineScope
 
+    //for notification
+    private lateinit var nManager : NotificationManager
+    private var notificationId = 10
+    private var notificationFileName = "Receiving"
+
     @SuppressLint("SetTextI18n", "ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,6 +87,7 @@ class ReceiveNow : AppCompatActivity() {
         binding2.receiverBelowBarText.text=
                 "receiving from :${Connection.partnerName} , free: ${Connection.formatDataString(appDir.freeSpace,' ')}"
         initializeHandler()
+        createNotificationChannel()
         mainScope.launch(Dispatchers.Main + parentJob) {
             val operation=receiveOnTCPAsync().await()
             operationHandler.obtainMessage(0,operation).sendToTarget()
@@ -198,14 +210,18 @@ class ReceiveNow : AppCompatActivity() {
             binding3.sendingFilename.text=name
             Animator.flipDrawable(
                 binding3.sendingThumbnail, Connection.findICON(applicationContext,name),200)
+            notificationFileName = name
+            notificationId++
             true
         }
 
         statusHandler=Handler(mainLooper) {
             val received=it.obj as Long
-            binding3.sendingFileStatus.text="${Connection.formatDataString(received,' ')} / ${Connection.formatDataString(currentFileSize,' ')}"
+            val progressText = "${Connection.formatDataString(received,' ')} / ${Connection.formatDataString(currentFileSize,' ')}"
+            binding3.sendingFileStatus.text= progressText
             val progress=(received*100/currentFileSize).toInt()
             binding3.sendingProgress.progress=progress
+            updateNotification(progress, progressText)
             true
         }
 
@@ -513,6 +529,38 @@ class ReceiveNow : AppCompatActivity() {
 
     override fun onBackPressed() {
         confirmExitDialog()
+    }
+
+    private fun createNotificationChannel() {
+        nManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationChannel = NotificationChannel(Connection.NOTIFICATION_CHANNEL_ID,
+                Connection.NOTIFICATION_CHANNEL, NotificationManager.IMPORTANCE_DEFAULT)
+            nManager.createNotificationChannel(notificationChannel)
+        }
+    }
+
+    private fun updateNotification(progress: Int, contentName: String) {
+        val notification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Notification.Builder(
+                this, Connection.NOTIFICATION_CHANNEL_ID).apply {
+                setSmallIcon(R.drawable.sendit_icon_new_small)
+                setProgress(100, progress, false)
+                setContentTitle(notificationFileName)
+                setContentText(contentName)
+            }.build()
+        } else {
+            Notification.Builder(this).apply {
+                setSmallIcon(R.drawable.sendit_icon_new_small)
+                setProgress(100, progress, false)
+                setContentTitle(notificationFileName)
+                setContentText(contentName)
+            }.build()
+        }
+        notification.contentIntent = PendingIntent.getActivity(
+            this, 0, Intent(this, ReceiveNow::class.java),
+            PendingIntent.FLAG_IMMUTABLE)
+        nManager.notify(notificationId, notification)
     }
 
     inner class ReceivedObject(val itemFile: File, val error:Boolean) {

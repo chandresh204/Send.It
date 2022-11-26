@@ -1,8 +1,14 @@
 package chad.orionsoft.sendit
 
 import android.annotation.SuppressLint
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
@@ -12,6 +18,7 @@ import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -50,6 +57,12 @@ class SendNowQ : AppCompatActivity() {
     private lateinit var binding: ActivitySendNowBinding
     private lateinit var binding2 : ItemSendingLayoutBinding
 
+    private lateinit var nManager : NotificationManager
+
+    private var notificationId = 10
+    private var notificationFileName = ""
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySendNowBinding.inflate(layoutInflater)
@@ -61,6 +74,7 @@ class SendNowQ : AppCompatActivity() {
         sAdapter=SendAdapterQ(sendList)
         binding.sendNowRecyclerView.adapter=sAdapter
         binding.sendNowRecyclerView.recycledViewPool.setMaxRecycledViews(0,0)
+        createNotificationChannel()
         CoroutineScope(Dispatchers.Main).launch {
             val res=sendFilesOnTCPAsync(sendList).await()
             Toast.makeText(applicationContext,res, Toast.LENGTH_SHORT).show()
@@ -70,6 +84,7 @@ class SendNowQ : AppCompatActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetTextI18n")
     private fun initializeHandlers() {
 
@@ -123,6 +138,8 @@ class SendNowQ : AppCompatActivity() {
         fileNameHandler=Handler(mainLooper) {
             val msg=it.obj as String
             binding2.sendingFilename.text=msg
+            notificationFileName = msg
+            notificationId++
             true
         }
 
@@ -139,6 +156,7 @@ class SendNowQ : AppCompatActivity() {
             //update progress-bar
             val progress:Int=(length*100/currentFileSize).toInt()
             binding2.sendingProgress.progress=progress
+            updateNotification(progress, update)
             true
         }
 
@@ -344,6 +362,29 @@ class SendNowQ : AppCompatActivity() {
                 return@async res
             }
         }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun createNotificationChannel() {
+        nManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        val notificationChannel = NotificationChannel(Connection.NOTIFICATION_CHANNEL_ID,
+            Connection.NOTIFICATION_CHANNEL, NotificationManager.IMPORTANCE_DEFAULT)
+        nManager.createNotificationChannel(notificationChannel)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun updateNotification(progress: Int, contentName: String) {
+        val notification = Notification.Builder(
+            this, Connection.NOTIFICATION_CHANNEL_ID).apply {
+            setSmallIcon(R.drawable.sendit_icon_new_small)
+            setProgress(100, progress, false)
+            setContentTitle(notificationFileName)
+            setContentText(contentName)
+        }.build()
+        notification.contentIntent = PendingIntent.getActivity(
+            this, 0, Intent(this, SendNowQ::class.java),
+            PendingIntent.FLAG_IMMUTABLE)
+        nManager.notify(notificationId, notification)
+    }
 
     companion object {
         const val SHOW_LAYOUT=1

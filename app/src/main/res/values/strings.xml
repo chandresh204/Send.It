@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Send.it</string>
     <string name="title_activity_main">MainActivity</string>
-    <string name="app_version">2.3.01 Beta</string>
+    <string name="app_version">2.3.02 Beta</string>
     <string name="send_it_directory">Send_it</string>
     <string name="send_it_apk_save_directory">Send_it/saved_APKs</string>
     <string name="send_now_label">Sending Now</string>

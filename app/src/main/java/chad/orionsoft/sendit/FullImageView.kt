@@ -146,12 +146,17 @@ class FullImageView : androidx.appcompat.widget.AppCompatImageView {
 
     inner class ScaleListener : ScaleGestureDetector.SimpleOnScaleGestureListener() {
 
-        override fun onScaleBegin(detector: ScaleGestureDetector?): Boolean {
+        override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
             mode=ZOOM
             return true
+
         }
 
-        override fun onScale(detector: ScaleGestureDetector?): Boolean {
+     /*   override fun onScaleBegin(detector: ScaleGestureDetector?): Boolean {
+
+        } */
+
+        override fun onScale(detector: ScaleGestureDetector): Boolean {
             var scaleFactor=detector?.scaleFactor as Float
             val origScale=saveScale
             saveScale *= scaleFactor

@@ -1,8 +1,14 @@
 package chad.orionsoft.sendit
 
 import android.annotation.SuppressLint
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -13,6 +19,7 @@ import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -50,7 +57,11 @@ class SendNow : AppCompatActivity() {
     private lateinit var binding: ActivitySendNowBinding
     private lateinit var binding2 : ItemSendingLayoutBinding
 
+    private lateinit var nManager : NotificationManager
+    private var notificationId = 10
+    private var notificationFileName = ""
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySendNowBinding.inflate(layoutInflater)
@@ -63,6 +74,7 @@ class SendNow : AppCompatActivity() {
         sAdapter=SendAdapter(sendList)
         binding.sendNowRecyclerView.adapter=sAdapter
         binding.sendNowRecyclerView.recycledViewPool.setMaxRecycledViews(0,0)
+        createNotificationChannel()
         CoroutineScope(Dispatchers.Main).launch {
             val res=sendFilesOnTCPAsync(sendList).await()
             Toast.makeText(applicationContext,res,Toast.LENGTH_SHORT).show()
@@ -141,6 +153,7 @@ class SendNow : AppCompatActivity() {
             //update progress-bar
             val progress:Int=(length*100/currentFileSize).toInt()
             binding2.sendingProgress.progress=progress
+            updateNotification(progress, update)
             true
         }
 
@@ -346,6 +359,40 @@ class SendNow : AppCompatActivity() {
                 return@async res
             }
         }
+
+    private fun createNotificationChannel() {
+        nManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+             val notificationChannel =NotificationChannel(
+                Connection.NOTIFICATION_CHANNEL_ID,
+                Connection.NOTIFICATION_CHANNEL, NotificationManager.IMPORTANCE_DEFAULT
+            )
+            nManager.createNotificationChannel(notificationChannel)
+        }
+    }
+
+    private fun updateNotification(progress: Int, contentName: String) {
+        val notification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Notification.Builder(
+                this, Connection.NOTIFICATION_CHANNEL_ID).apply {
+                setSmallIcon(R.drawable.sendit_icon_new_small)
+                setProgress(100, progress, false)
+                setContentTitle("Sending")
+                setContentText(contentName)
+            }.build()
+        } else {
+            Notification.Builder(this).apply {
+                setSmallIcon(R.drawable.sendit_icon_new_small)
+                setProgress(100, progress, false)
+                setContentTitle("Sending")
+                setContentText(contentName)
+            }.build()
+        }
+        notification.contentIntent = PendingIntent.getActivity(
+            this, 0, Intent(this, SendNow::class.java),
+            PendingIntent.FLAG_IMMUTABLE)
+        nManager.notify(10, notification)
+    }
 
     companion object {
         const val SHOW_LAYOUT=1
