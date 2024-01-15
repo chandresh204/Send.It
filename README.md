@@ -9,4 +9,8 @@ Send.it can be used to transfer files over wifi network. to send files to other 
 5) in receiver mode, no special options are available. after pairing receiver will only wait for sender to send file.
 6) in edit option you can change your username.
 
+# Install from Play
+<a href="https://play.google.com/store/apps/details?id=chad.orionsoft.sendit">
+<img alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/apps/en-play-badge.png" height="50px"/></a>
+
 ![](https://github.com/chandresh204/Send.It/blob/master/send_it_sending.gif)
