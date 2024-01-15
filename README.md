@@ -8,3 +8,5 @@ Send.it can be used to transfer files over wifi network. to send files to other 
 4) in sender mode there are few categories you can choose. Images, audio, video. To select any particular file the Select option is provided. Using Select option you can choose any of the file from file manager and send it. the last option is for switching mode. this will convert sender into receiver and receiver into sender.
 5) in receiver mode, no special options are available. after pairing receiver will only wait for sender to send file.
 6) in edit option you can change your username.
+
+![](https://github.com/chandresh204/Send.It/blob/master/send_it_sending.gif)
